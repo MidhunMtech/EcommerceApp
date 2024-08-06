@@ -1,1 +1,1 @@
-Hey youuuu
+<cflocation  url="./home.cfm">
