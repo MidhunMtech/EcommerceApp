@@ -1,4 +1,5 @@
 <cftry>
+
 <cfset pageSize = 10>
 <cfset currentPage = Iif(IsNumeric(url.page), url.page, 1)>
 <cfset offset = (currentPage - 1) * pageSize>
@@ -52,42 +53,14 @@
         <ul class="pagination">
             <cfif currentPage gt 1>
                 <li class="page-item">
-                    <cfoutput><a class="page-link" href="?page=#currentPage - 1#">Previous</a></cfoutput>
+                    <a class="page-link" href="?page=<cfoutput>#currentPage - 1#</cfoutput>">Previous</a>
                 </li>
             </cfif>
-
-            <!-- Show page numbers -->
-            <cfset startPage = Iif(currentPage - 1 < 1, 1, currentPage - 1)>
-            <cfset endPage = Iif(currentPage + 1 > totalPages, totalPages, currentPage + 1)>
-
-            <cfif startPage gt 1>
-                <li class="page-item">
-                    <a class="page-link" href="?page=1">1</a>
-                </li>
-                <cfif startPage gt 2>
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                </cfif>
-            </cfif>
-
-            <cfloop from="#startPage#" to="#endPage#" index="i">
+            <cfloop from="1" to="#totalPages#" index="i">
                 <li class="page-item #Iif(i eq currentPage, 'active', '')#">
                     <cfoutput><a class="page-link" href="?page=#i#">#i#</a></cfoutput>
                 </li>
             </cfloop>
-
-            <cfif endPage lt totalPages>
-                <cfif endPage lt totalPages - 1>
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                </cfif>
-                <li class="page-item">
-                    <cfoutput><a class="page-link" href="?page=#totalPages#">#totalPages#</a></cfoutput>
-                </li>
-            </cfif>
-
             <cfif currentPage lt totalPages>
                 <li class="page-item">
                     <cfoutput><a class="page-link" href="?page=#currentPage + 1#">Next</a></cfoutput>
@@ -95,6 +68,7 @@
             </cfif>
         </ul>
     </nav>
+    
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>

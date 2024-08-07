@@ -1,3 +1,7 @@
+<cfif structKeyExists(session, "userid")>
+    <cflocation  url="/profile.cfm">
+</cfif>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,12 +12,13 @@
         <link rel="stylesheet" href="css/stylesheets.css">
     </head>
     <body>
+        <cfinclude  template="/navbar.cfm">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
                     <div class="card shadow">
                         <div class="card-header text-center">
-                            <h4>Admin Login</h4>
+                            <h4>Login</h4>
                         </div>
                         <div class="card-body">
                             <form action="" method="post">
@@ -28,9 +33,13 @@
                                 <button type="submit" class="btn btn-primary btn-block" name="login">Login</button>
                             </form>
                         </div>
+                        <div class="card-footer text-center">
+                            <small>Don't have an account? <a href="/signup.cfm">Sign up here</a></small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <cfinclude  template="/footer.cfm">
     </body>
 </html>

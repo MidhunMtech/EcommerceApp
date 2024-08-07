@@ -1,0 +1,58 @@
+body {
+  background-color: #d7dfe7;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
+
+.card-img-top {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  height: 300px; /* Adjust the height as needed */
+  width: 100%; /* Ensures the image takes the full width of the card */
+  object-fit: cover; /* Ensures the image covers the container without distorting */
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 1rem;
+  color: #28a745;
+}
+
+.pagination .page-link {
+  color: #007bff;
+}
+
+.pagination .page-link:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+.card a{
+    text-decoration: none;
+    color: black;
+}
+
+.product-rating {
+  color: black;
+}
+.imgProduct {
+  height: 500px;
+}

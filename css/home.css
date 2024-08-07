@@ -1,0 +1,27 @@
+.hero {
+    background: url('https://via.placeholder.com/1920x600') no-repeat center center;
+    background-size: cover;
+    height: 600px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.hero h1 {
+    font-size: 4em;
+}
+.product-card {
+    margin-bottom: 30px;
+}
+.product-card img {
+    max-height: 200px;
+    object-fit: cover;
+}
+.nav_ul li {
+    padding-inline: 10px;
+}
+.nav_ul li:hover {
+    background-color: rgb(214, 210, 210);
+    border-radius: 25px;
+}
