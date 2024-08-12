@@ -14,51 +14,72 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema Ecommerce
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `Ecommerce` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `Ecommerce`;
 USE `Ecommerce` ;
+
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Address` (
-  `idAddress` INT NULL AUTO_INCREMENT,
-  `Address` LONGTEXT NULL,
-  `address_is_active` INT NULL,
-  `createdDate` DATETIME NULL,
-  `deletedDate` DATETIME NULL,
-  PRIMARY KEY (`idAddress`))
-ENGINE = InnoDB;
+  `idAddress` INT AUTO_INCREMENT,
+  `Address` LONGTEXT,
+  `address_is_active` INT,
+  `createdDate` DATETIME,
+  `deletedDate` DATETIME,
+  PRIMARY KEY (`idAddress`)
+);
 
+select * from Address;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`User`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`User` (
-  `idUser` INT NULL AUTO_INCREMENT,
-  `Name` VARCHAR(55) NULL,
-  `Email` VARCHAR(220) NULL,
-  `Phone` VARCHAR(15) NULL,
-  `Password` VARCHAR(255) NULL,
-  `Salt` VARCHAR(255) NULL,
-  `user_is_active` INT NULL,
-  `Address_idAddress` INT NULL,
-  `createdDate` DATETIME NULL,
+  `idUser` INT AUTO_INCREMENT,
+  `Name` VARCHAR(55),
+  `Email` VARCHAR(220),
+  `Phone` VARCHAR(15),
+  `Password` VARCHAR(255),
+  `Salt` VARCHAR(255),
+  `user_is_active` INT,
+  `Address_idAddress` INT,
+  `createdDate` DATETIME,
   PRIMARY KEY (`idUser`),
-  UNIQUE INDEX `Email_UNIQUE` (`Email` ASC) VISIBLE,
-  INDEX `fk_User_Address1_idx` (`Address_idAddress` ASC) VISIBLE,
   CONSTRAINT `fk_User_Address1`
     FOREIGN KEY (`Address_idAddress`)
     REFERENCES `Ecommerce`.`Address` (`idAddress`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+    ON UPDATE NO ACTION);
 
+select * from User;
+
+
+-- -----------------------------------------------------
+-- Table `Ecommerce`.`profileImage`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Ecommerce`.`profileImage` (
+  `idprofileImage` INT AUTO_INCREMENT,
+  `imageName` VARCHAR(100),
+  `User_idUser` INT NOT NULL,
+  `createdDate` DATETIME,
+  `is_active` INT,
+  PRIMARY KEY (`idprofileImage`),
+  INDEX `fk_profileImage_User_idx` (`User_idUser` ASC) VISIBLE,
+  CONSTRAINT `fk_profileImage_User_idx`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `Ecommerce`.`User` (`idUser`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+select * from profileImage;
+truncate table profileImage;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Admin`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Admin` (
-  `idAdmin` INT NULL AUTO_INCREMENT,
+  `idAdmin` INT AUTO_INCREMENT,
   `AdminUserName` VARCHAR(45) NULL,
   `AdminPassword` VARCHAR(45) NULL,
   `createdDate` DATETIME NULL,
@@ -71,7 +92,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`Category`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Category` (
-  `idCategory` INT NULL AUTO_INCREMENT,
+  `idCategory` INT AUTO_INCREMENT,
   `nameCategory` VARCHAR(45) NULL,
   `category_is_delete` INT NULL,
   `Admin_created` INT NOT NULL,
@@ -98,7 +119,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`Sub_Category`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Sub_Category` (
-  `idSubcategory` INT NULL AUTO_INCREMENT,
+  `idSubcategory` INT AUTO_INCREMENT,
   `nameSubCategory` VARCHAR(100) NULL,
   `Category_idCategory` INT NOT NULL,
   `Sub_Category_is_delete` INT NULL,
@@ -169,7 +190,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`Rating`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Rating` (
-  `idRating` INT NULL,
+  `idRating` INT AUTO_INCREMENT,
   `productRating` INT NULL,
   `Products_idProducts` INT NOT NULL,
   `rated_time` DATETIME NULL,
@@ -202,7 +223,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`OrderIdTable`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
-  `orderId` INT NULL,
+  `orderId` INT AUTO_INCREMENT,
   `Order_date` DATETIME NULL,
   `User_idUser` INT NOT NULL,
   `Address_idAddress` INT NOT NULL,
@@ -251,7 +272,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`productImage`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`productImage` (
-  `idproductImage` INT NULL,
+  `idproductImage` INT AUTO_INCREMENT,
   `imageName` VARCHAR(100) NULL,
   `Products_idProducts` INT NOT NULL,
   `createdDate` DATETIME NULL,
@@ -269,7 +290,7 @@ ENGINE = InnoDB;
 -- Table `Ecommerce`.`Cart`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Cart` (
-  `idCart` INT NULL,
+  `idCart` INT AUTO_INCREMENT,
   `quantity` INT NULL,
   `Products_idProducts` INT NOT NULL,
   `User_idUser` INT NOT NULL,

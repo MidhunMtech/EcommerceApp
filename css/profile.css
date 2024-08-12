@@ -1,0 +1,17 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.profileBtn button a{
+    text-decoration: none;
+    color: black;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.content {
+    flex: 1;
+}
