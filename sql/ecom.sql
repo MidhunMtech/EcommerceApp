@@ -10,7 +10,10 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema Ecommerce
 -- -----------------------------------------------------
-
+-- Disable foreign key checks
+SET FOREIGN_KEY_CHECKS = 0;
+-- Enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
 -- -----------------------------------------------------
 -- Schema Ecommerce
 -- -----------------------------------------------------
@@ -31,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Address` (
 );
 
 select * from Address;
+-- drop table Address;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`User`
@@ -40,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`User` (
   `Name` VARCHAR(55),
   `Email` VARCHAR(220),
   `Phone` VARCHAR(15),
+  `imageName` VARCHAR(100),
   `Password` VARCHAR(255),
   `Salt` VARCHAR(255),
   `user_is_active` INT,
@@ -53,52 +58,35 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`User` (
     ON UPDATE NO ACTION);
 
 select * from User;
+-- drop table User;
 
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`profileImage`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`profileImage` (
-  `idprofileImage` INT AUTO_INCREMENT,
-  `imageName` VARCHAR(100),
-  `User_idUser` INT NOT NULL,
-  `createdDate` DATETIME,
-  `is_active` INT,
-  PRIMARY KEY (`idprofileImage`),
-  INDEX `fk_profileImage_User_idx` (`User_idUser` ASC) VISIBLE,
-  CONSTRAINT `fk_profileImage_User_idx`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `Ecommerce`.`User` (`idUser`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
-select * from profileImage;
-truncate table profileImage;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Admin`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Admin` (
   `idAdmin` INT AUTO_INCREMENT,
-  `AdminUserName` VARCHAR(45) NULL,
-  `AdminPassword` VARCHAR(45) NULL,
-  `createdDate` DATETIME NULL,
+  `AdminUserName` VARCHAR(45),
+  `AdminPassword` VARCHAR(45),
+  `createdDate` DATETIME,
   PRIMARY KEY (`idAdmin`),
   UNIQUE INDEX `AdminUserName_UNIQUE` (`AdminUserName` ASC) VISIBLE)
 ENGINE = InnoDB;
 
+select * from Admin;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Category`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Category` (
   `idCategory` INT AUTO_INCREMENT,
-  `nameCategory` VARCHAR(45) NULL,
-  `category_is_delete` INT NULL,
-  `Admin_created` INT NOT NULL,
-  `Admin_deleted` INT NOT NULL,
-  `createdDate` DATETIME NULL,
-  `deletedDate` DATETIME NULL,
+  `nameCategory` VARCHAR(45),
+  `category_is_active` INT DEFAULT TRUE,
+  `Admin_created` INT,
+  `Admin_deleted` INT,
+  `Admin_edited` INT,
+  `createdDate` DATETIME,
+  `deletedDate` DATETIME,
   PRIMARY KEY (`idCategory`),
   INDEX `fk_Category_Admin1_idx` (`Admin_created` ASC) VISIBLE,
   INDEX `fk_Category_Admin2_idx` (`Admin_deleted` ASC) VISIBLE,
@@ -114,19 +102,22 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Category` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+select * from Category;
+-- truncate table Category;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Sub_Category`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Sub_Category` (
   `idSubcategory` INT AUTO_INCREMENT,
-  `nameSubCategory` VARCHAR(100) NULL,
-  `Category_idCategory` INT NOT NULL,
-  `Sub_Category_is_delete` INT NULL,
-  `Admin_isCreated` INT NOT NULL,
-  `Admin_isDeleted` INT NOT NULL,
-  `createdDate` DATETIME NULL,
-  `deletedDate` DATETIME NULL,
+  `nameSubCategory` VARCHAR(100),
+  `Category_idCategory` INT,
+  `Sub_Category_is_delete` INT DEFAULT FALSE,
+  `Admin_isCreated` INT,
+  `Admin_isEdited` INT,
+  `Admin_isDeleted` INT,
+  `createdDate` DATETIME,
+  `deletedDate` DATETIME,
   PRIMARY KEY (`idSubcategory`),
   INDEX `fk_Sub_Category_Category_idx` (`Category_idCategory` ASC) VISIBLE,
   INDEX `fk_Sub_Category_Admin1_idx` (`Admin_isCreated` ASC) VISIBLE,
@@ -148,22 +139,24 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Sub_Category` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+select * from Sub_Category;
+-- truncate table Sub_Category;
+
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Products`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Products` (
-  `idProducts` INT NULL AUTO_INCREMENT,
-  `nameProduct` VARCHAR(55) NULL,
-  `Description` VARCHAR(255) NULL,
-  `Price` INT NULL,
-  `Sub_Category_idSubcategory` VARCHAR(100) NOT NULL,
-  `product_is_active` INT NULL,
-  `admin_Created` INT NULL,
-  `admin_deleted` INT NULL,
-  `productImage_idproductImage` INT NOT NULL,
-  `createdDate` INT NULL,
-  `deletedDate` DATETIME NULL,
+  `idProducts` INT AUTO_INCREMENT,
+  `nameProduct` VARCHAR(55),
+  `Description` VARCHAR(255),
+  `Price` INT,
+  `Sub_Category_idSubcategory` INT,
+  `product_is_active` INT DEFAULT TRUE,
+  `admin_Created` INT,
+  `admin_deleted` INT,
+  `createdDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `deletedDate` DATETIME,
   PRIMARY KEY (`idProducts`),
   INDEX `fk_Products_Sub_Category1_idx` (`Sub_Category_idSubcategory` ASC) VISIBLE,
   INDEX `fk_Products_Admin1_idx` (`admin_Created` ASC) VISIBLE,
@@ -185,6 +178,8 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Products` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+select * from Products;
+-- truncate table Products;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Rating`

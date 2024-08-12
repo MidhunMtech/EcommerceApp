@@ -197,4 +197,146 @@
         <cfreturn local.userProfileStruct>
     </cffunction>
 
+
+    <cffunction  name="addProducts" access="public" returnType="void">
+        <cfargument  name="form" type="any" required="true">
+
+        <cfif structKeyExists(form, "categoryName")>
+            <cfquery name="local.addCategory" datasource="#application.db#">
+                INSERT INTO
+                    Category(
+                        nameCategory,
+                        Admin_created,
+                        createdDate
+                    )
+                VALUES (
+                    <cfqueryparam value="#arguments.form.categoryName#" cfsqltype="cf_sql_varchar">,
+                    <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+                )
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(form, "subCategoryName")>
+            <cfquery name="local.addsubCategory" datasource="#application.db#">
+                INSERT INTO 
+                    Sub_Category (
+                        nameSubCategory,
+                        Category_idCategory,
+                        Admin_isCreated,
+                        createdDate
+                    )
+                VALUES (
+                    <cfqueryparam value="#arguments.form.subCategoryName#" cfsqltype="cf_sql_varchar">,
+                    <cfqueryparam value="#arguments.form.categoryId#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+                )
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(form, "productName")>
+            <cfquery name="local.addProducts" datasource="#application.db#">
+                INSERT INTO 
+                    Products (
+                        nameProduct,
+                        Description,
+                        Price,
+                        Sub_Category_idSubcategory,
+                        admin_Created
+
+                    )
+                VALUES (
+                    <cfqueryparam value="#arguments.form.productName#" cfsqltype="cf_sql_varchar">,
+                    <cfqueryparam value="#arguments.form.productDesc#" cfsqltype="cf_sql_varchar">,
+                    <cfqueryparam value="#arguments.form.productPrice#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#arguments.form.subcat#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">
+                )
+            </cfquery>
+        </cfif>
+    </cffunction>
+
+
+    <cffunction  name="getCategories" access="remote" returnformat="JSON">
+        <cfargument  name="catid" type="numeric" required="false">
+        <cfargument  name="subid" type="numeric" required="false">
+
+        <cfset local.CategoryArray = []>
+        <cfset local.ProductArray = []>
+        <cfset local.return = []>
+        <cfquery name="local.getCategory" datasource="#application.db#">
+            SELECT 
+                ctr.nameCategory AS categoryName,
+                ctr.idCategory AS categoryId,
+                sub.nameSubCategory AS subCategoryName,
+                sub.idSubcategory AS subCategoryId
+                <!---pdt.idProducts AS productId,
+                pdt.nameProduct AS productName,
+                pdt.Description AS productDescription,
+                pdt.Price AS productPrice--->
+            FROM
+                Category AS ctr
+            LEFT JOIN 
+                Sub_Category AS sub
+                ON
+                    ctr.idCategory = sub.Category_idCategory
+            <!---LEFT JOIN 
+                Products AS pdt
+                ON 
+                    sub.idSubcategory = pdt.Sub_Category_idSubcategory--->
+            WHERE 
+                <cfif structKeyExists(arguments, "catid")>
+                    ctr.idCategory = <cfqueryparam value="#arguments.catid#" cfsqltype="cf_sql_integer">
+                    AND 
+                <cfelseif structKeyExists(arguments, "subid")>
+                    sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
+                    AND 
+                </cfif>
+                (ctr.category_is_active = 1
+                OR sub.Sub_Category_is_delete = 0)
+            ORDER BY 
+                categoryId
+        </cfquery>
+        <cfloop query="local.getCategory" group="categoryId">
+            <cfset local.structCategory = {
+                "categoryName" : local.getCategory.categoryName,
+                "categoryId" : local.getCategory.categoryId,
+                "subCategory" : []
+            }>
+            <cfloop>
+                <cfset arrayAppend(local.structCategory.subCategory, {
+                    "Id" : local.getCategory.subCategoryId,
+                    "Name" : local.getCategory.subCategoryName
+                })>
+            </cfloop>
+            <cfset arrayAppend(local.CategoryArray, local.structCategory)>
+        </cfloop>
+        <cfset arrayAppend(local.return, local.CategoryArray)>
+
+        <cfquery name="local.getProducts" datasource="#application.db#">
+            SELECT
+                pdt.idProducts AS productId,
+                pdt.nameProduct AS productName,
+                pdt.Description AS productDescription,
+                pdt.Price AS productPrice
+            FROM 
+                Products AS pdt
+            WHERE
+                pdt.product_is_active = 1
+        </cfquery>
+
+        <cfloop query="local.getProducts">
+            <cfset local.structProduct = {
+                "productId" : local.getProducts.productId,
+                "productName" : local.getProducts.productName,
+                "productDescription" : local.getProducts.productDescription,
+                "productPrice" : local.getProducts.productPrice
+            }>
+            <cfset arrayAppend(local.ProductArray, local.structProduct)>
+        </cfloop>
+        <cfset arrayAppend(local.return, local.ProductArray)>
+        <cfreturn local.return>
+    </cffunction>
+
 </cfcomponent>
