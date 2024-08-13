@@ -1,5 +1,5 @@
 .hero {
-    background: url('https://via.placeholder.com/1920x600') no-repeat center center;
+    background: url('https://avatars.mds.yandex.net/get-pdb/1088712/8b19d278-0b9b-46f8-89e4-66f5541efc55/s1200?webp=false') no-repeat center center;
     background-size: cover;
     height: 600px;
     color: white;
@@ -24,4 +24,12 @@
 .nav_ul li:hover {
     background-color: rgb(214, 210, 210);
     border-radius: 25px;
+}
+.productLink{
+    text-decoration: none;
+    color: black;
+}
+.productLink:hover{
+    text-decoration: none;
+    color: black;
 }

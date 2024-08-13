@@ -1,3 +1,4 @@
+<cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
 <script src="js/home.js" defer></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
@@ -23,38 +24,22 @@
                     <b>Categories</b>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="">Electronics</a></li>
-                    <li><a class="dropdown-item" href="">Fashion</a></li>
-                    <li class="dropdown-submenu dropleft">
-                        <a class="dropdown-item dropdown-toggle" href="">Phone</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/product.cfm">Apple</a></li>
-                            <li><a class="dropdown-item" href="">Kitchen</a></li>
-                            <li><a class="dropdown-item" href="">Outdoor</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown-submenu dropleft" >
-                        <a class="dropdown-item dropdown-toggle" href="">Home & Garden</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="">Furniture</a></li>
-                            <li><a class="dropdown-item" href="">Kitchen</a></li>
-                            <li><a class="dropdown-item" href="">Outdoor</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown-submenu dropleft" >
-                        <a class="dropdown-item dropdown-toggle" href="">Home & Garden</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="">Furniture</a></li>
-                            <li><a class="dropdown-item" href="">Kitchen</a></li>
-                            <li><a class="dropdown-item" href="">Outdoor</a></li>
-                        </ul>
-                    </li>
-                    <li><a class="dropdown-item" href="">Sports</a></li>
-                    <li><a class="dropdown-item" href="">Toys</a></li>
+                    <cfoutput>
+                        <cfloop array="#getCat[1]#" index="cat">
+                            <li class="dropdown-submenu dropleft">
+                                <a class="dropdown-item dropdown-toggle" href="">#cat.categoryName#</a>
+                                <ul class="dropdown-menu">
+                                    <cfloop array="#cat.subCategory#" index="sub">
+                                        <li><a class="dropdown-item" href="/product.cfm?subid=#sub.Id#">#sub.Name#</a></li>
+                                    </cfloop>
+                                </ul>
+                            </li>
+                        </cfloop>
+                    </cfoutput>
                 </ul>
-                </li>
+            </li>
             <li class="nav-item active mx-2">
-                <a class="nav-link" href="#"><b><i class="bi bi-cart"></i>Cart</b></a>
+                <a class="nav-link" href="/cart.cfm"><b><i class="bi bi-cart"></i>Cart</b></a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="/profile.cfm"><i class="bi bi-person-circle"></i></a>

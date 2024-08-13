@@ -20,26 +20,19 @@
     <script src="/js/dash.js" defer></script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-3 ">
       <div class="container-fluid">
         <a class="navbar-brand" href="?logout=true">Logout</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="">Add Image</a>
-            </li>
-          </ul>
-        </div>
       </div>
     </nav>
-    <div class="container">
+    <div class="container-fluid">
       <div class="row">
         <!-- Column 1 -->
         <cfoutput>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="column-heading">
               <h5>Category</h5><span class="sort-by"></span>
               <button class="btn btn-primary btn-sm" id="addCategory">Add</button>
@@ -49,7 +42,7 @@
                 <div class="list-group-item align-items-center">
                   <span value="">#getcategory.categoryName#</span>
                   <!--- <a href="?id=#getcategory.categoryId#" class="btn btn-light btn-sm float-right">Sortby</a> --->
-                  <button class="btn btn-danger btn-sm mx-2 float-right deleteCategory">Delete</button>
+                  <button class="btn btn-danger btn-sm mx-2 float-right deleteCategory" data-userid="#getcategory.categoryId#">Delete</button>
                   <button class="btn btn-secondary btn-sm float-right editCategory" data-userid="#getcategory.categoryId#">Edit</button>
                 </div>
               </cfloop>
@@ -57,7 +50,7 @@
           </div>
 
           <!-- Column 2 -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="column-heading">
               <h5>Sub-Category</h5><span class="sort-by"></span>
               <button class="btn btn-primary btn-sm" id="addSubCategory">Add</button>
@@ -65,11 +58,11 @@
             <div class="scrollable-column list-group">
               <cfloop array="#getCat[1]#" index="sub">
                 <cfloop array="#sub.subCategory#" index="subCategory">
-                  <cfif len(subCategory.Name)>
+                  <cfif len(subCategory.Name) AND subCategory.is_delete EQ 0>
                     <div class="list-group-item align-items-center">
                       <span>#subCategory.Name#</span>
                       <!--- <a href="" class="btn btn-light btn-sm float-right">Sortby</a> --->
-                      <button class="btn btn-danger btn-sm mx-2 float-right deleteSubCategory">Delete</button>
+                      <button class="btn btn-danger btn-sm mx-2 float-right deleteSubCategory" data-userid="#subCategory.Id#">Delete</button>
                       <button class="btn btn-secondary btn-sm float-right editSubCategory" data-userid="#subCategory.Id#">Edit</button>
                     </div>
                   </cfif>
@@ -79,18 +72,42 @@
           </div>
 
           <!-- Column 3 -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="column-heading">
               <h5>Products</h5><span class="sort-by"></span>
               <button class="btn btn-primary btn-sm" id="addProducts">Add</button>
             </div>
             <div class="scrollable-column list-group">
               <cfloop array="#getCat[2]#" index="product">
-                <div class="list-group-item align-items-center">
-                  <span>#product.productName#</span>
-                  <button class="btn btn-danger btn-sm ml-2 float-right deleteProduct">Delete</button>
-                  <button class="btn btn-secondary btn-sm float-right editProduct">Edit</button>
-                </div>
+                <cfif product.sub_is_delete EQ 0>
+                  <div class="list-group-item align-items-center">
+                    <span>#product.productName#</span>
+                    <button class="btn btn-danger btn-sm ml-2 float-right deleteProduct" data-userid="#product.productId#">Delete</button>
+                    <button class="btn btn-secondary btn-sm float-right editProduct" data-userid="#product.productId#">Edit</button>
+                  </div>
+                </cfif>
+              </cfloop>
+            </div>
+          </div>
+
+          <!-- Column 4 -->
+          <div class="col-md-3">
+            <div class="column-heading">
+              <h5>Images</h5><span class="sort-by"></span>
+              <button class="btn btn-primary btn-sm" id="addImages">Add</button>
+            </div>
+            <div class="scrollable-column list-group">
+              <cfloop array="#getCat[2]#" index="img">
+                <cfloop array="#img.image#" index="image">
+                  <cfif len(image.imageName) AND image.is_delete EQ 0>
+                    <div class="list-group-item align-items-center">
+                      <span>#image.imageName#</span>
+                      <!--- <a href="" class="btn btn-light btn-sm float-right">Sortby</a> --->
+                      <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="#image.imageId#">Delete</button>
+                      <button class="btn btn-secondary btn-sm float-right editImage" data-userid="#image.imageId#">Edit</button>
+                    </div>
+                  </cfif>
+                </cfloop>
               </cfloop>
             </div>
           </div>
@@ -109,7 +126,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="submit" class="btn btn-success" name="products">Add</button>
+                <button type="submit" class="btn btn-success" name="submit">Add</button>
               </div>
             </form>
           </div>
@@ -136,7 +153,7 @@
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="submit" class="btn btn-success" name="products">Add</button>
+                <button type="submit" class="btn btn-success" name="submit">Add</button>
               </div>
             </form>
           </div>
@@ -175,33 +192,60 @@
                 <input type="number" class="form-control" id="rate" name="productPrice" min="0" step="0.01" required>
               </div>
 
-              <!--- <div class="form-group">
-                <label for="image">Image:</label>
-                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
-              </div> --->
+              <div class="form-group">
+                <label for="image">Thumbnail:</label>
+                <input type="file" class="form-control-file" id="image" name="thumbnail" accept="image/*" required>
+              </div>
               
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="submit" class="btn btn-success" name="products">Add</button>
+                <button type="submit" class="btn btn-success" name="submit">Add</button>
               </div>
           </form>
+          </div>
+        </div>
+
+        <div id="addImageModal" class="modal"> <!-- Add Image -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <form action="" method="post" id="editForm" enctype="multipart/form-data">
+              <div class="form-group">
+                <label for="product">Product:</label>
+                <select class="form-control" id="category" name="productId">
+                  <option value="">Select a Product</option>
+                  <cfloop array="#getCat[2]#" index="pro">
+                    <cfif pro.sub_is_delete EQ 0>
+                      <option value="#pro.productId#">#pro.productName#</option>
+                    </cfif>
+                  </cfloop>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="image">Image:</label>
+                <input type="file" class="form-control-file" id="image" name="productImage" accept="image/*" required>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary categoryClose">Close</button>
+                <button type="submit" class="btn btn-success" name="submit">Add</button>
+              </div>
+            </form>
           </div>
         </div>
 
         <div id="editCategoryModal" class="modal"> <!-- Edit Category -->
           <div class="modal-content">
             <span class="close">&times;</span>
-            <form id="editForm">
+            <form action="" method="post" id="editForm">
               <div class="form-group">
                 <label for="nameInput">Category</label>
-                <input type="text" class="form-control cat_categoryName" value="">
+                <input type="text" class="form-control cat_categoryName" value="" name="cat_categoryName">
               </div>
 
               <input type="hidden" class="form-control cat_categoryId" name="cat_categoryId">
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="button" class="btn btn-success">Save changes</button>
+                <button type="submit" class="btn btn-success" name="submit">Save changes</button>
               </div>
             </form>
           </div>
@@ -210,10 +254,10 @@
         <div id="editSubCategoryModal" class="modal"> <!-- Edit Sub Category -->
           <div class="modal-content">
             <span class="close">&times;</span>
-            <form id="editForm">
+            <form action="" method="post" id="editForm">
               <div class="form-group">
                 <label for="category">Category:</label>
-                <select class="form-control" id="category" name="category">
+                <select class="form-control" id="category" name="sub_mainCategory">
                   <option value="" class="sub_category"></option>
                   <cfloop array="#getCat[1]#" index="getcategory">
                     <option value="#getcategory.categoryId#">#getcategory.categoryName#</option>
@@ -223,61 +267,93 @@
 
               <div class="form-group">
                 <label for="nameInput">Sub-Category:</label>
-                <input type="text" class="form-control sub_subCategoryName" value="" >
+                <input type="text" class="form-control sub_subCategoryName" value="" name="sub_subCategoryName">
               </div>
 
               <input type="hidden" class="form-control sub_subCategoryId" name="sub_subCategoryId">
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="button" class="btn btn-success">Save changes</button>
+                <button type="submit" class="btn btn-success" name="submit">Save changes</button>
               </div>
             </form>
           </div>
         </div>
 
-        <div id="editProductModal" class="modal">   <!-- Add Products -->
+        <div id="editProductModal" class="modal">   <!-- Edit Products -->
           <div class="modal-content">
             <span class="close">&times;</span>
-            <form action="your-action-url" method="post" enctype="multipart/form-data">
+            <form action="" method="post" enctype="multipart/form-data">
               <div class="form-group">
                 <label for="category">Category:</label>
-                <select class="form-control" id="category" name="category">
-                  <option value="">Select a category</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="clothing">Clothing</option>
-                  <option value="home_appliances">Home Appliances</option>
-                  <option value="books">Books</option>
-                  <option value="other">Other</option>
+                <select class="form-control" id="category" name="pro_subcategory">
+                  <option value="" class="pro_subcat"></option>
+                  <cfloop array="#getCat[1]#" index="sub">
+                    <cfloop array="#sub.subCategory#" index="subCategory">
+                      <cfif len(subCategory.Name)>
+                        <option value="#subCategory.Id#">#subCategory.Name#</option>
+                      </cfif>
+                    </cfloop>
+                  </cfloop>
                 </select>
               </div>
 
               <div class="form-group">
                 <label for="nameProduct">Product Name:</label>
-                <input type="text" class="form-control" name="nameProduct" >
+                <input type="text" class="form-control productName" name="pro_productName">
               </div>
 
               <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea class="form-control" name="description" rows="4" ></textarea>
+                <textarea class="form-control productDesc" name="pro_productDesc" rows="4" ></textarea>
               </div>
               <div class="form-group">
-                <label for="rate">Rate:</label>
-                <input type="number" class="form-control" name="rate" min="0" step="0.01" >
+                <label for="rate">Price:</label>
+                <input type="number" class="form-control productPrice" name="pro_productPrice" min="0" step="0.01" >
               </div>
 
-              <div class="form-group">
+              <!--- <div class="form-group">
                 <label for="image">Image:</label>
                 <input type="file" class="form-control-file" name="image" accept="image/*" >
-              </div>
+              </div> --->
 
-              <input type="hidden" class="form-control" name="productId" >
+              <input type="hidden" class="form-control productId" name="pro_productId" >
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary categoryClose">Close</button>
-                <button type="button" class="btn btn-success">Save Changes</button>
+                <button type="submit" class="btn btn-success" name="submit">Save Changes</button>
               </div>
           </form>
+          </div>
+        </div>
+
+        <div id="EditImageModal" class="modal"> <!-- Edit Image -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <form action="" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                <label for="product">Product:</label>
+                <select class="form-control" id="category" name="img_productId">
+                  <option value="" class="imgProductId"></option>
+                  <cfloop array="#getCat[2]#" index="pro">
+                    <cfif pro.sub_is_delete EQ 0>
+                      <option value="#pro.productId#">#pro.productName#</option>
+                    </cfif>
+                  </cfloop>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="image">Image:</label>
+                <input type="file" class="form-control-file" id="image" name="img_imageName" accept="image/*">
+                <b><p class="oldImg text-success"></p></b>
+              </div>
+              <input type="hidden" class="oldImgName" name="img_oldImage">
+              <input type="hidden" class="imgId" name="img_imageId">
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary categoryClose">Close</button>
+                <button type="submit" class="btn btn-success" name="submit">Add</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

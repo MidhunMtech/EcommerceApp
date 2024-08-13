@@ -14,6 +14,10 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 SET FOREIGN_KEY_CHECKS = 0;
 -- Enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
+-- to disable the safe updates mode
+SET SQL_SAFE_UPDATES = 0;
+-- to Enable the safe updates mode
+SET SQL_SAFE_UPDATES = 1;
 -- -----------------------------------------------------
 -- Schema Ecommerce
 -- -----------------------------------------------------
@@ -142,7 +146,6 @@ ENGINE = InnoDB;
 select * from Sub_Category;
 -- truncate table Sub_Category;
 
-
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Products`
 -- -----------------------------------------------------
@@ -151,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Products` (
   `nameProduct` VARCHAR(55),
   `Description` VARCHAR(255),
   `Price` INT,
+  `thumbnail` VARCHAR(100),
   `Sub_Category_idSubcategory` INT,
   `product_is_active` INT DEFAULT TRUE,
   `admin_Created` INT,
@@ -181,6 +185,109 @@ ENGINE = InnoDB;
 select * from Products;
 -- truncate table Products;
 
+
+-- update Products
+-- set
+-- product_is_active = 1;
+-- -----------------------------------------------------
+-- Table `Ecommerce`.`productImage`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Ecommerce`.`productImage` (
+  `idproductImage` INT AUTO_INCREMENT,
+  `imageName` VARCHAR(100),
+  `Products_idProducts` INT NOT NULL,
+  `image_is_delete` INT DEFAULT FALSE,
+  `createdDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idproductImage`),
+  INDEX `fk_productImage_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
+  CONSTRAINT `fk_productImage_Products1`
+    FOREIGN KEY (`Products_idProducts`)
+    REFERENCES `Ecommerce`.`Products` (`idProducts`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+select * from productImage;
+-- truncate table productImage;
+
+
+-- -----------------------------------------------------
+-- Table `Ecommerce`.`Cart`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Ecommerce`.`Cart` (
+  `idCart` INT AUTO_INCREMENT,
+  `quantity` INT,
+  `Products_idProducts` INT NOT NULL,
+  `User_idUser` INT,
+  `createdDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `sessionId` VARCHAR(100),
+  PRIMARY KEY (`idCart`),
+  INDEX `fk_Cart_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
+  INDEX `fk_Cart_User1_idx` (`User_idUser` ASC) VISIBLE,
+  CONSTRAINT `fk_Cart_Products1`
+    FOREIGN KEY (`Products_idProducts`)
+    REFERENCES `Ecommerce`.`Products` (`idProducts`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Cart_User1`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `Ecommerce`.`User` (`idUser`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+
+-- -----------------------------------------------------
+-- Table `Ecommerce`.`OrderIdTable`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
+  `orderId` INT AUTO_INCREMENT,
+  `Order_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `User_idUser` INT NOT NULL,
+  `Address_idAddress` INT NOT NULL,
+  PRIMARY KEY (`orderId`),
+  INDEX `fk_OrderIdTable_User1_idx` (`User_idUser` ASC) VISIBLE,
+  INDEX `fk_OrderIdTable_Address1_idx` (`Address_idAddress` ASC) VISIBLE,
+  CONSTRAINT `fk_OrderIdTable_User1`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `Ecommerce`.`User` (`idUser`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_OrderIdTable_Address1`
+    FOREIGN KEY (`Address_idAddress`)
+    REFERENCES `Ecommerce`.`Address` (`idAddress`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Ecommerce`.`OrderDetails`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderDetails` (
+  `idOrderDetails` INT NULL AUTO_INCREMENT,
+  `OrderIdTable_orderId` INT,
+  `Products_idProducts` INT,
+  `quantity` INT,
+  `totalPrice` INT,
+  PRIMARY KEY (`idOrderDetails`),
+  INDEX `fk_OrderDetails_OrderIdTable1_idx` (`OrderIdTable_orderId` ASC) VISIBLE,
+  INDEX `fk_OrderDetails_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
+  CONSTRAINT `fk_OrderDetails_OrderIdTable1`
+    FOREIGN KEY (`OrderIdTable_orderId`)
+    REFERENCES `Ecommerce`.`OrderIdTable` (`orderId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_OrderDetails_Products1`
+    FOREIGN KEY (`Products_idProducts`)
+    REFERENCES `Ecommerce`.`Products` (`idProducts`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`Rating`
 -- -----------------------------------------------------
@@ -205,106 +312,6 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Rating` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`table1`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`table1` (
-)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`OrderIdTable`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
-  `orderId` INT AUTO_INCREMENT,
-  `Order_date` DATETIME NULL,
-  `User_idUser` INT NOT NULL,
-  `Address_idAddress` INT NOT NULL,
-  PRIMARY KEY (`orderId`),
-  INDEX `fk_OrderIdTable_User1_idx` (`User_idUser` ASC) VISIBLE,
-  INDEX `fk_OrderIdTable_Address1_idx` (`Address_idAddress` ASC) VISIBLE,
-  CONSTRAINT `fk_OrderIdTable_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `Ecommerce`.`User` (`idUser`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_OrderIdTable_Address1`
-    FOREIGN KEY (`Address_idAddress`)
-    REFERENCES `Ecommerce`.`Address` (`idAddress`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`OrderDetails`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderDetails` (
-  `idOrderDetails` INT NULL AUTO_INCREMENT,
-  `OrderIdTable_orderId` INT NULL,
-  `Products_idProducts` INT NULL,
-  `quantity` INT NULL,
-  `totalPrice` INT NULL,
-  PRIMARY KEY (`idOrderDetails`),
-  INDEX `fk_OrderDetails_OrderIdTable1_idx` (`OrderIdTable_orderId` ASC) VISIBLE,
-  INDEX `fk_OrderDetails_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
-  CONSTRAINT `fk_OrderDetails_OrderIdTable1`
-    FOREIGN KEY (`OrderIdTable_orderId`)
-    REFERENCES `Ecommerce`.`OrderIdTable` (`orderId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_OrderDetails_Products1`
-    FOREIGN KEY (`Products_idProducts`)
-    REFERENCES `Ecommerce`.`Products` (`idProducts`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`productImage`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`productImage` (
-  `idproductImage` INT AUTO_INCREMENT,
-  `imageName` VARCHAR(100) NULL,
-  `Products_idProducts` INT NOT NULL,
-  `createdDate` DATETIME NULL,
-  PRIMARY KEY (`idproductImage`),
-  INDEX `fk_productImage_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
-  CONSTRAINT `fk_productImage_Products1`
-    FOREIGN KEY (`Products_idProducts`)
-    REFERENCES `Ecommerce`.`Products` (`idProducts`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Ecommerce`.`Cart`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Ecommerce`.`Cart` (
-  `idCart` INT AUTO_INCREMENT,
-  `quantity` INT NULL,
-  `Products_idProducts` INT NOT NULL,
-  `User_idUser` INT NOT NULL,
-  `createdDate` DATETIME NULL,
-  `sessionId` VARCHAR(100) NULL,
-  PRIMARY KEY (`idCart`),
-  INDEX `fk_Cart_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
-  INDEX `fk_Cart_User1_idx` (`User_idUser` ASC) VISIBLE,
-  CONSTRAINT `fk_Cart_Products1`
-    FOREIGN KEY (`Products_idProducts`)
-    REFERENCES `Ecommerce`.`Products` (`idProducts`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Cart_User1`
-    FOREIGN KEY (`User_idUser`)
-    REFERENCES `Ecommerce`.`User` (`idUser`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

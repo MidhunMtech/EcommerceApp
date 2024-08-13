@@ -1,3 +1,5 @@
+<cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
+<!--- <cfdump  var="#getcat#" abort> --->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -28,7 +30,30 @@
 
             <div class="row" id="product-list">
                 <!-- Example Product Card -->
-                <div class="col-md-4 mb-4">
+                <cfloop array="#getcat[2]#" index="product">
+                    <cfoutput>
+                        <cfif product.sub_is_delete EQ 0>
+                            <div class="col-md-4">
+                                <div class="card product-card">
+                                    <cftry>
+                                        <a href="productDetails.cfm?id=#product.productId#" class="productLink">
+                                            <img class="card-img-top" src="/images/thumbnail/#product.thumbnail#" alt="#product.thumbnail#" height="150">
+                                            <div class="card-body">
+                                                <h5 class="card-title">#product.productName#</h5>
+                                                <p class="card-text text-danger">&##8377; #product.productPrice#</p>
+                                                <a href="productDetails.cfm?id=#product.productId#" class="btn btn-primary">Buy Now</a>
+                                            </div>
+                                        </a>
+                                    <cfcatch type="any">
+                                        <cfdump  var="#cfcatch#">
+                                    </cfcatch>
+                                    </cftry>
+                                </div>
+                            </div>
+                        </cfif>
+                    </cfoutput>
+                </cfloop>
+                <!--- <div class="col-md-4 mb-4">
                     <div class="card">
                         <a href="/productDetails.cfm">
                             <img src="images/image.png" class="card-img-top" alt="Product 1">
@@ -37,8 +62,8 @@
                             <p class="card-text">$10.00</p>
                         </a>
                     </div>
-                </div>
-                </div>
+                </div> --->
+            </div>
                 <!-- Add more product cards as needed -->
             </div>
         </div>
