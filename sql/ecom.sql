@@ -34,11 +34,16 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Address` (
   `address_is_active` INT,
   `createdDate` DATETIME,
   `deletedDate` DATETIME,
+  `selected` INT,
   PRIMARY KEY (`idAddress`)
 );
+ALTER TABLE Address
+ADD COLUMN User_idUser INT,
+ADD CONSTRAINT fk_User_idUser
+FOREIGN KEY (User_idUser) REFERENCES User(idUser);
 
 select * from Address;
--- drop table Address;
+-- truncate table Address;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`User`
@@ -63,6 +68,8 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`User` (
 
 select * from User;
 -- drop table User;
+
+
 
 
 -- -----------------------------------------------------
@@ -218,9 +225,9 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Cart` (
   `idCart` INT AUTO_INCREMENT,
   `quantity` INT,
   `Products_idProducts` INT NOT NULL,
-  `User_idUser` INT,
+  `User_idUser` INT NULL,
   `createdDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `sessionId` VARCHAR(100),
+  `sessionId` VARCHAR(100) DEFAULT 0,
   PRIMARY KEY (`idCart`),
   INDEX `fk_Cart_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
   INDEX `fk_Cart_User1_idx` (`User_idUser` ASC) VISIBLE,
@@ -237,6 +244,8 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Cart` (
 ENGINE = InnoDB;
 
 
+select * from Cart;
+-- truncate table Cart;
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`OrderIdTable`

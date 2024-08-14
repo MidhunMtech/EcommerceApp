@@ -1,12 +1,21 @@
 <cfif NOT structKeyExists(session, "userId")>
     <cflocation  url="/login.cfm">
 </cfif>
+<cfinvoke component="component.component" method="logout" returnvariable="logout">
+<cfif logout EQ "1">
+    <cflocation  url="/login.cfm">
+</cfif>
 <cftry>
     <cfinvoke  method="userProfile" component="component.component" returnvariable="profile">
-    <cfinvoke component="component.component" method="logout" returnvariable="logout">
-    <cfif logout EQ "1">
-        <cflocation  url="/login.cfm">
-    </cfif>
+    <cfinvoke  method="addAndGetAddress" component="component.component" returnVariable="getAddress">
+
+    <cfparam name = "addressName" default = "#profile.Address#">
+    <cfloop array="#getAddress#" index="address">
+        <cfif address.selected EQ 1>
+            <cfset addressName = address.Address>
+        </cfif>
+    </cfloop>
+    
 <cfcatch type="any">
     <cfdump  var="#cfcatch#">
 </cfcatch>
@@ -20,7 +29,7 @@
     <title>Profile Page</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/profile.css">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="content">
@@ -34,8 +43,8 @@
                         <p class="text-muted">Email: #profile.Email#</p>
                         <p class="text-muted">Phone: #profile.Phone#</p>
                         <div class="d-flex justify-content-center">
-                            <p class="mr-2">Address: #profile.Address#</p>
-                            <button class="btn btn-primary btn-sm">Add/Edit</button>
+                            <p class="mr-2">Address: #addressName#</p>
+                            <a href="address.cfm"><button class="btn btn-primary btn-sm">Add/Edit</button></a>
                         </div>
                     </cfoutput>
                     <hr>

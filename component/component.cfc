@@ -156,7 +156,10 @@
     <cffunction  name="logout" returnType="string" access="public" hint="For logout">
         <cfset local.return = "0" />
         <cfif structKeyExists(url, "logout") AND url.logout EQ "true">
-            <cfset structClear(session) />
+            <cfset structDelete(session, "userId")>
+            <cfset local.return = "1" />
+        <cfelseif structKeyExists(url, "logout") AND url.logout EQ "Atrue">
+            <cfset structDelete(session, "adminid")>
             <cfset local.return = "1" />
         </cfif>
         
@@ -436,6 +439,251 @@
 
         </cfif>
         
+    </cffunction>
+
+
+    <cffunction  name="addAndGetAddress" access="remote" returnformat="JSON" hint="For adding and editing Address">
+        <cfargument  name="form" type="any" required="false">
+        <cfargument  name="addid" type="numeric" required="false">
+        <cfargument  name="delid" type="numeric" required="false">
+        <cfargument  name="selectid" type="numeric" required="false">
+
+        <cfset local.addressReturn = []>
+
+        <cfif structKeyExists(form, "addAddress")>      <!--- Add New Address --->
+            <cfquery name="local.addAddress" datasource="#application.db#">
+                INSERT INTO 
+                    Address (
+                        Address,
+                        address_is_active,
+                        createdDate,
+                        User_idUser,
+                        selected
+                    )
+                VALUES (
+                    <cfqueryparam value="#arguments.form.addAddress#" cfsqltype="cf_sql_varchar">,
+                    1,
+                    <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+                    <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">,
+                    0
+                )
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(form, "newAddress")>      <!--- Edit address --->
+            <cfquery name="local.editAddress" datasource="#application.db#">
+                UPDATE 
+                    Address
+                SET 
+                    address_is_active = 0
+                WHERE
+                   idAddress =  <cfqueryparam value="#arguments.form.oldAddresId#" cfsqltype="cf_sql_integer">
+            </cfquery>
+
+            <cfquery name="local.addEditAddress" datasource="#application.db#">
+                INSERT INTO 
+                    Address (
+                        Address,
+                        address_is_active,
+                        createdDate,
+                        User_idUser,
+                        selected
+                    )
+                VALUES (
+                    <cfqueryparam value="#arguments.form.newAddress#" cfsqltype="cf_sql_varchar">,
+                    1,
+                    <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+                    <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">,
+                    0
+                )
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(arguments, "delid")>      <!---  delete Address --->
+            <cfquery name="local.deleteAddress" datasource="#application.db#">
+                UPDATE 
+                    Address
+                SET 
+                    address_is_active = 0
+                WHERE
+                   idAddress =  <cfqueryparam value="#arguments.delid#" cfsqltype="cf_sql_integer">
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(arguments, "selectid")>       <!---  for selecting address --->
+            <cfquery name="local.cancelSelectAddress" datasource="#application.db#">
+                UPDATE 
+                    Address
+                SET 
+                    selected = 0
+            </cfquery>
+
+            <cfquery name="local.selectAddress" datasource="#application.db#">
+                UPDATE 
+                    Address
+                SET 
+                    selected = 1
+                WHERE
+                   idAddress =  <cfqueryparam value="#arguments.selectid#" cfsqltype="cf_sql_integer">
+            </cfquery>
+        </cfif>
+
+        <cfquery name="local.getAddress" datasource="#application.db#">
+            SELECT 
+                idAddress,
+                Address,
+                address_is_active,
+                selected,
+                User_idUser
+            FROM 
+                Address
+            WHERE
+                User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_varchar">
+                AND address_is_active = 1
+                <cfif structKeyExists(arguments, "addid")>
+                    AND idAddress = <cfqueryparam value="#arguments.addid#" cfsqltype="cf_sql_integer">
+                </cfif>
+            ORDER BY Address
+        </cfquery>
+
+        <cfloop query="local.getAddress">
+            <cfset local.addressStruct = {
+                "id" : local.getAddress.idAddress,
+                "Address" : local.getAddress.Address,
+                "selected" : local.getAddress.selected
+            }>
+            <cfset arrayAppend(local.addressReturn, local.addressStruct)>
+        </cfloop>
+        
+        <cfreturn local.addressReturn>
+    </cffunction>
+
+
+    <cffunction  name="addToCart" access="remote" returnformat="JSON">
+        <cfargument  name="proid" type="numeric" required="false">
+        <cfargument  name="cartid" type="numeric" required="false">
+        <cfargument  name="quantity" type="numeric" required="false">
+        <cfargument  name="quantityid" type="numeric" required="false">
+
+        <cfif structKeyExists(arguments, "proid")>
+            <cfif structKeyExists(session, "userId")>
+                <cfquery name="local.checkCartProductByUser" datasource="#application.db#">
+                    SELECT 
+                        Products_idProducts
+                    FROM 
+                        Cart
+                    WHERE
+                        Products_idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
+                        AND User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
+                </cfquery>
+
+                <cfif queryRecordCount(local.checkCartProductByUser)>
+                    <cfquery name="local.updateQuantityUser" datasource="#application.db#">
+                        UPDATE 
+                            Cart 
+                        SET 
+                            quantity = quantity + 1
+                        WHERE
+                            Products_idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
+                            AND User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
+                    </cfquery>
+                <cfelse>
+                    <cfquery name="local.userAddToCart" datasource="#application.db#">
+                        INSERT INTO 
+                            Cart(
+                                quantity,
+                                Products_idProducts,
+                                User_idUser
+                            )
+                        VALUES (
+                            1,
+                            <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">,
+                            <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
+                        )
+                    </cfquery>
+                </cfif>
+            <cfelse>
+                <cfquery name="local.checkCartProductBySession" datasource="#application.db#">
+                    SELECT 
+                        Products_idProducts
+                    FROM 
+                        Cart
+                    WHERE
+                        Products_idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
+                        AND sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
+                </cfquery>
+
+                <cfif queryRecordCount(local.checkCartProductBySession)>
+                    <cfquery name="local.updateQuantitySession" datasource="#application.db#">
+                        UPDATE 
+                            Cart 
+                        SET 
+                            quantity = quantity + 1
+                        WHERE
+                            Products_idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
+                            AND sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
+                    </cfquery>
+                <cfelse>
+                    <cfquery name="local.userAddToCartBySession" datasource="#application.db#">
+                        INSERT INTO 
+                            Cart(
+                                quantity,
+                                Products_idProducts,
+                                sessionId
+                            )
+                        VALUES (
+                            1,
+                            <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">,
+                            <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
+                        )
+                    </cfquery>
+                </cfif>
+            </cfif>
+        </cfif>
+
+        <cfif structKeyExists(arguments, "cartid")>
+            <cfquery datasource="#application.db#">
+                DELETE FROM
+                    Cart
+                WHERE
+                    idCart = <cfqueryparam value="#arguments.cartid#" cfsqltype="cf_sql_integer">
+            </cfquery>
+        </cfif>
+
+        <cfif structKeyExists(arguments, "quantity") AND structKeyExists(arguments, "quantityid")>
+            <cfquery name="local.quatityUpdate" datasource="#application.db#">
+                UPDATE
+                    Cart
+                SET 
+                    quantity = <cfqueryparam value="#arguments.quantity#" cfsqltype="cf_sql_integer">
+                WHERE 
+                    idCart = <cfqueryparam value="#arguments.quantityid#" cfsqltype="cf_sql_integer">
+            </cfquery>
+        </cfif>
+
+        <cfquery name="local.getCart" datasource="#application.db#">
+            SELECT 
+                crt.idCart AS cartid,
+                crt.quantity AS quantity,
+                crt.Products_idProducts AS productId,
+                crt.User_idUser AS userId,
+                crt.sessionId AS sessionId,
+                pdt.nameProduct AS productName,
+                pdt.Price AS productPrice,
+                pdt.thumbnail AS thumbnail
+            FROM 
+                Cart AS crt
+            INNER JOIN
+                Products AS pdt
+                ON crt.Products_idProducts = pdt.idProducts
+            WHERE
+                sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
+                <cfif structKeyExists(session, "userId")>
+                    OR User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
+                </cfif>
+        </cfquery>
+
+        <cfreturn local.getCart>
     </cffunction>
 
 

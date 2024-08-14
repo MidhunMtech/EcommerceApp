@@ -135,7 +135,43 @@ $(document).ready(function() {
         });
     });
 
+    function deleteItem(itemType, itemId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            $.ajax({
+                url: '../component/component.cfc?method=deleteProduct',
+                method: 'POST',
+                data: {
+                    [itemType]: itemId
+                },
+                success: function(response) {
+                    window.location.href = 'adminDash.cfm';
+                }
+            });
+        }
+    }
+    
+    $(".deleteProduct").click(function() { 
+        var proid = $(this).data('userid');
+        deleteItem('proid', proid);
+    });
+    
+    $(".deleteSubCategory").click(function() { 
+        var subid = $(this).data('userid');
+        deleteItem('subid', subid);
+    });
+    
+    $(".deleteCategory").click(function() { 
+        var catid = $(this).data('userid');
+        deleteItem('catid', catid);
+    });
+
     $(".deleteImage").click(function() { 
+        var imgid = $(this).data('userid');
+        deleteItem('imgid', imgid);
+    });
+    
+
+    /* $(".deleteImage").click(function() { 
         var imgid = $(this).data('userid');
 
         if (confirm("Are you sure you want to delete this user?")) {
@@ -201,5 +237,5 @@ $(document).ready(function() {
                 }
             });
         }
-    });
+    }); */
 });

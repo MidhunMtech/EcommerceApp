@@ -8,6 +8,8 @@
     <title>Product Details</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/product.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/productDetails.js"></script>
 </head>
 <body>
 <cfinclude  template="/navbar.cfm">
@@ -28,15 +30,6 @@
                                     <cfset variables.active = "">
                                 </cfif>
                             </cfloop>
-                            <!--- <div class="carousel-item active">
-                                <img src="/images/iphone/image1.png" class="d-block w-100 imgProduct" alt="Product Image 1">
-                            </div>
-                            <div class="carousel-item">
-                                <img src="/images/iphone/image2.png" class="d-block w-100 imgProduct" alt="Product Image 2">
-                            </div>
-                            <div class="carousel-item">
-                                <img src="/images/iphone/image.png" class="d-block w-100 imgProduct" alt="Product Image 3">
-                            </div> --->
                         </div>
                         <a class="carousel-control-prev" href="##productCarousel" role="button" data-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -70,7 +63,7 @@
                             <option>5 Stars</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary mt-3">Add to Cart</button>
+                    <button class="btn btn-primary mt-3 addToCart" data-userid="#product.productId#">Add to Cart</button>
                 </div>
             </cfloop>
         </cfoutput>
@@ -79,5 +72,6 @@
 
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <cfinclude  template="/footer.cfm">
+<script src="/js/jquery.min.js"></script>
 </body>
 </html>
