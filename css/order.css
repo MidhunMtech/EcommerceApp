@@ -1,0 +1,42 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.order-card {
+    margin-bottom: 20px;
+}
+.order-img {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
+}
+.order-info {
+    flex: 1;
+}
+.order-date {
+    color: #888;
+}
+.btnclass {
+    height: 40px
+}
+img {
+    margin-right: 100px;
+}
+.order-container {
+    margin: 50px auto;
+    max-width: 800px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.product-img {
+    margin-top: 10px;
+    width: 200px;
+    height: 200px;
+}
+.invoice-btn {
+    margin-top: 20px;
+    margin-left: 0;
+}

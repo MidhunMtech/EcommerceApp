@@ -1,4 +1,5 @@
 <cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
+<cfinvoke  method="rating" component="component.component" returnVariable="rating">
 <!--- <cfdump  var="#getCat[2]#" abort> --->
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +18,14 @@
     <div class="row">
         <cfoutput>
             <cfloop array="#getCat[2]#" index="product">
+                <cfparam  name="productRating" default="0">
+                <cfloop query="rating">
+                    <cfif rating.Products_idProducts EQ product.productId>
+                        <cfset productRating = rating.proRating>
+                    </cfif>
+                    <!--- <cfdump  var="#rating.Products_idProducts#">
+                    <cfdump  var="#product.productId#"> --->
+                </cfloop>
                 <div class="col-md-6">
                 <!-- Carousel for Product Images -->
                     <div id="productCarousel" class="carousel slide" data-ride="carousel">
@@ -47,21 +56,11 @@
                     <h4>&##8377; #product.productPrice#</h4>
                     <p>#product.productDescription#</p>
                     <div class="product-rating">
+                        <span>#productRating# &##9733;</span><!--- 
                         <span>&##9733;</span>
                         <span>&##9733;</span>
                         <span>&##9733;</span>
-                        <span>&##9733;</span>
-                        <span>&##9734;</span> <!-- 4 out of 5 stars -->
-                    </div>
-                    <div class="mt-3">
-                        <label for="rateProduct">Rate this product:</label>
-                        <select id="rateProduct" class="form-control w-25">
-                            <option>1 Star</option>
-                            <option>2 Stars</option>
-                            <option>3 Stars</option>
-                            <option>4 Stars</option>
-                            <option>5 Stars</option>
-                        </select>
+                        <span>&##9734;</span> <!-- 4 out of 5 stars --> --->
                     </div>
                     <button class="btn btn-primary mt-3 addToCart" data-userid="#product.productId#">Add to Cart</button>
                 </div>

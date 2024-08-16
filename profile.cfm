@@ -49,7 +49,7 @@
                     </cfoutput>
                     <hr>
                     <div class="d-flex justify-content-around mt-4 profileBtn">
-                        <button class="btn btn-info">Order Details</button>
+                        <a href="orderList.cfm"><button class="btn btn-info">Order Details</button></a>
                         <a href="profile.cfm?logout=true"><button class="btn btn-danger">Logout</button></a>
                     </div>
                 </div>

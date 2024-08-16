@@ -310,10 +310,10 @@ select * from OrderDetails;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`Rating` (
   `idRating` INT AUTO_INCREMENT,
-  `productRating` INT NULL,
-  `Products_idProducts` INT NOT NULL,
-  `rated_time` DATETIME NULL,
-  `User_idUser` INT NOT NULL,
+  `productRating` INT,
+  `Products_idProducts` INT,
+  `rated_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `User_idUser` INT,
   PRIMARY KEY (`idRating`),
   INDEX `fk_Rating_Products1_idx` (`Products_idProducts` ASC) VISIBLE,
   INDEX `fk_Rating_User1_idx` (`User_idUser` ASC) VISIBLE,
@@ -328,6 +328,9 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Rating` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+
+SELECT * FROM Rating;
 
 
 

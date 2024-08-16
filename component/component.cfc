@@ -567,9 +567,9 @@
         <cfargument  name="quantity" type="numeric" required="false">
         <cfargument  name="quantityid" type="numeric" required="false">
 
-        <cfif structKeyExists(arguments, "proid")>
-            <cfif structKeyExists(session, "userId")>
-                <cfquery name="local.checkCartProductByUser" datasource="#application.db#">
+        <cfif structKeyExists(arguments, "proid")>      <!--- To add product in cart --->
+            <cfif structKeyExists(session, "userId")>       <!--- To check user is loggined --->
+                <cfquery name="local.checkCartProductByUser" datasource="#application.db#">     <!--- To check the product is already added to the cart or not --->
                     SELECT 
                         Products_idProducts
                     FROM 
@@ -579,7 +579,7 @@
                         AND User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
                 </cfquery>
 
-                <cfif queryRecordCount(local.checkCartProductByUser)>
+                <cfif queryRecordCount(local.checkCartProductByUser)>       <!--- If the product already in the cart, then increase the quantity --->
                     <cfquery name="local.updateQuantityUser" datasource="#application.db#">
                         UPDATE 
                             Cart 
@@ -590,7 +590,7 @@
                             AND User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
                     </cfquery>
                 <cfelse>
-                    <cfquery name="local.userAddToCart" datasource="#application.db#">
+                    <cfquery name="local.userAddToCart" datasource="#application.db#">      <!--- If the product NOT in the cart, then ADD THE PRODUCT --->
                         INSERT INTO 
                             Cart(
                                 quantity,
@@ -604,8 +604,8 @@
                         )
                     </cfquery>
                 </cfif>
-            <cfelse>
-                <cfquery name="local.checkCartProductBySession" datasource="#application.db#">
+            <cfelse>         <!--- if user NOT loggined --->
+                <cfquery name="local.checkCartProductBySession" datasource="#application.db#">      <!--- To check the product is already added to the cart or not --->
                     SELECT 
                         Products_idProducts
                     FROM 
@@ -615,7 +615,7 @@
                         AND sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
                 </cfquery>
 
-                <cfif queryRecordCount(local.checkCartProductBySession)>
+                <cfif queryRecordCount(local.checkCartProductBySession)>        <!--- if exists increase the quantity by 1 --->
                     <cfquery name="local.updateQuantitySession" datasource="#application.db#">
                         UPDATE 
                             Cart 
@@ -625,7 +625,7 @@
                             Products_idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
                             AND sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar">
                     </cfquery>
-                <cfelse>
+                <cfelse>        <!--- else add the product to the cart --->
                     <cfquery name="local.userAddToCartBySession" datasource="#application.db#">
                         INSERT INTO 
                             Cart(
@@ -643,7 +643,7 @@
             </cfif>
         </cfif>
 
-        <cfif structKeyExists(arguments, "cartid")>
+        <cfif structKeyExists(arguments, "cartid")>     <!--- Thi so remove product from cart by clicking remove button --->
             <cfquery datasource="#application.db#">
                 DELETE FROM
                     Cart
@@ -652,7 +652,7 @@
             </cfquery>
         </cfif>
 
-        <cfif structKeyExists(arguments, "quantity") AND structKeyExists(arguments, "quantityid")>
+        <cfif structKeyExists(arguments, "quantity") AND structKeyExists(arguments, "quantityid")>      <!--- This is to increase the quantity by manually --->
             <cfquery name="local.quatityUpdate" datasource="#application.db#">
                 UPDATE
                     Cart
@@ -663,7 +663,7 @@
             </cfquery>
         </cfif>
 
-        <cfquery name="local.getCart" datasource="#application.db#">
+        <cfquery name="local.getCart" datasource="#application.db#">        <!--- To get all the products in cart --->
             SELECT 
                 crt.idCart AS cartid,
                 crt.quantity AS quantity,
@@ -693,7 +693,7 @@
         <cfargument  name="form" type="any" required="false">
         <cfargument  name="items" type="query" required="false">
 
-        <cfquery name="local.addOrderId" datasource="#application.db#" result="local.addOrderToTable">  <!--- To ibsert order in orderIId Table --->
+        <cfquery name="local.addOrderId" datasource="#application.db#" result="local.addOrderToTable">  <!--- To insert order in orderIId Table --->
             INSERT INTO 
                 OrderIdTable(
                     User_idUser,
@@ -739,8 +739,109 @@
     </cffunction>
 
 
-    <cffunction  name="getOrderDetails" access="public" returntype="any">
-        
+    <cffunction  name="getOrderDetails" access="public" returntype="array">
+
+        <cfset local.returnArray = []>
+        <cfquery name="local.getOrderDetails" datasource="#application.db#">        <!--- To get order details to show --->
+            SELECT 
+                ordId.User_idUser AS userId,
+                ordId.totalAmout AS TotalAmount,
+                ordId.Order_date AS orderDate,
+                ordId.orderId AS orderId,
+                ordId.Address_idAddress AS orderAddress,
+                ordDetails.totalPrice AS productQuantityPrice,
+                ordDetails.quantity As quantity,
+                ordDetails.Products_idProducts AS productId,
+                ordDetails.idOrderDetails AS orderDetailsId,
+                pdt.thumbnail AS thumbnail,
+                pdt.Price AS productPrice,
+                pdt.nameProduct AS productName,
+                adr.Address AS Address
+            FROM
+                OrderIdTable AS ordId
+            INNER JOIN
+                OrderDetails AS ordDetails
+                ON ordDetails.OrderIdTable_orderId = ordId.orderId
+            INNER JOIN 
+                Products AS pdt 
+                ON pdt.idProducts = ordDetails.Products_idProducts
+            INNER JOIN 
+                Address AS adr 
+                ON adr.idAddress = ordId.Address_idAddress
+            WHERE
+                ordId.User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer" />
+                <cfif structKeyExists(url, "oid")>
+                    AND ordDetails.idOrderDetails = <cfqueryparam value="#url.oid#" cfsqltype="cf_sql_integer">
+                </cfif>
+        </cfquery>
+
+        <cfloop query="local.getOrderDetails">
+            <cfset local.orderStruct = {
+                "userId" : local.getOrderDetails.userId,
+                "TotalAmount" : local.getOrderDetails.TotalAmount,
+                "orderDate" : local.getOrderDetails.orderDate,
+                "orderId" : local.getOrderDetails.orderId,
+                "orderAddress" : local.getOrderDetails.orderAddress,
+                "productId" : local.getOrderDetails.productId,
+                "quantity" : local.getOrderDetails.quantity,
+                "productQuantityPrice" : local.getOrderDetails.productQuantityPrice,
+                "orderDetailsId" : local.getOrderDetails.orderDetailsId,
+                "thumbnail" : local.getOrderDetails.thumbnail,
+                "productName" : local.getOrderDetails.productName,
+                "productPrice" : local.getOrderDetails.productPrice,
+                "Address" : local.getOrderDetails.Address
+            }>
+            <cfset arrayAppend(local.returnArray, local.orderStruct)>
+        </cfloop>
+
+        <cfreturn local.returnArray>
+    </cffunction>
+
+
+    <cffunction  name="rating" access="public" returnType="any">
+        <cfargument  name="form" type="any" required="false">
+
+        <cfif structKeyExists(arguments, "form")>
+            <cfquery name="local.getUserRating" datasource="#application.db#">      <!--- to check user rated this product or not --->
+                SELECT 
+                    User_idUser,
+                    Products_idProducts
+                FROM 
+                    Rating
+                WHERE
+                    User_idUser = <cfqueryparam  value="#session.userId#" cfsqltype="cf_sql_integer" />
+                    AND Products_idProducts = <cfqueryparam  value="#arguments.form.productId#" cfsqltype="cf_sql_integer" />
+            </cfquery>
+
+            <cfif NOT queryRecordCount(local.getUserRating)>        <!--- if not rate the product --->
+                <cfquery name="local.addRating" datasource="#application.db#">
+                    INSERT INTO 
+                        Rating(
+                            productRating,
+                            Products_idProducts,
+                            User_idUser
+                        )
+                    VALUES (
+                        <cfqueryparam  value="#arguments.form.rating#" cfsqltype="cf_sql_integer" />,   
+                        <cfqueryparam  value="#arguments.form.productId#" cfsqltype="cf_sql_integer" />,   
+                        <cfqueryparam  value="#session.userId#" cfsqltype="cf_sql_integer" />
+                    )
+                </cfquery>
+            </cfif>
+            <cfset local.getRating = "">
+        <cfelse>
+            <cfquery name="local.getRating" datasource="#application.db#">          <!--- To get rating by average --->
+                SELECT 
+                    ROUND(AVG(productRating), 1) AS proRating,
+                    Products_idProducts
+                FROM 
+                    Rating
+                GROUP BY
+                    Products_idProducts
+            </cfquery>
+        </cfif>
+
+        <cfreturn local.getRating>
     </cffunction>
 
 
@@ -753,7 +854,7 @@
         <cfset local.CategoryArray = []>
         <cfset local.ProductArray = []>
         <cfset local.return = []>
-        <cfquery name="local.getCategory" datasource="#application.db#">
+        <cfquery name="local.getCategory" datasource="#application.db#">        <!--- To get category an dsubcategory to show --->
             SELECT 
                 ctr.nameCategory AS categoryName,
                 ctr.idCategory AS categoryId,
@@ -795,7 +896,7 @@
         </cfloop>
         <cfset arrayAppend(local.return, local.CategoryArray)>
 
-        <cfquery name="local.getProducts" datasource="#application.db#">
+        <cfquery name="local.getProducts" datasource="#application.db#">        <!--- To get sub-cat , Product And product image to show --->
             SELECT
                 distinct(pdt.idProducts) AS productId,
                 pdt.nameProduct AS productName,
