@@ -253,6 +253,7 @@ select * from Cart;
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
   `orderId` INT AUTO_INCREMENT,
   `Order_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `totalAmout` INT,
   `User_idUser` INT NOT NULL,
   `Address_idAddress` INT NOT NULL,
   PRIMARY KEY (`orderId`),
@@ -270,12 +271,15 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+select * from OrderIdTable;
+-- truncate table OrderIdTable;
+
 
 -- -----------------------------------------------------
 -- Table `Ecommerce`.`OrderDetails`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderDetails` (
-  `idOrderDetails` INT NULL AUTO_INCREMENT,
+  `idOrderDetails` INT AUTO_INCREMENT,
   `OrderIdTable_orderId` INT,
   `Products_idProducts` INT,
   `quantity` INT,
@@ -294,6 +298,10 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderDetails` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+
+select * from OrderDetails;
+-- truncate table OrderDetails;
 
 
 

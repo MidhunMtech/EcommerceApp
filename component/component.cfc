@@ -197,6 +197,7 @@
             "imageName" : local.getUserProfile.imageName,
             "Address" : local.getUserProfile.Address
         }>
+
         <cfreturn local.userProfileStruct>
     </cffunction>
 
@@ -415,7 +416,7 @@
             </cfquery>
         </cfif> 
 
-        <cfif structKeyExists(arguments, "catid")>
+        <cfif structKeyExists(arguments, "catid")>      <!--- category delete --->
             <cfquery name="local.deleteCategory" datasource="#application.db#">
                 UPDATE 
                     Category
@@ -426,6 +427,7 @@
                 WHERE 
                     idCategory = <cfqueryparam value="#arguments.catid#" cfsqltype="cf_sql_integer">
             </cfquery>
+
             <cfquery name="local.deletesubCategory" datasource="#application.db#">
                 UPDATE 
                     Sub_Category
@@ -528,7 +530,7 @@
             </cfquery>
         </cfif>
 
-        <cfquery name="local.getAddress" datasource="#application.db#">
+        <cfquery name="local.getAddress" datasource="#application.db#">        <!--- Fetch Address to show in address page --->
             SELECT 
                 idAddress,
                 Address,
@@ -684,6 +686,61 @@
         </cfquery>
 
         <cfreturn local.getCart>
+    </cffunction>
+
+
+    <cffunction  name="orderItems" access="public" returntype="void">
+        <cfargument  name="form" type="any" required="false">
+        <cfargument  name="items" type="query" required="false">
+
+        <cfquery name="local.addOrderId" datasource="#application.db#" result="local.addOrderToTable">  <!--- To ibsert order in orderIId Table --->
+            INSERT INTO 
+                OrderIdTable(
+                    User_idUser,
+                    totalAmout,
+                    Address_idAddress
+                )
+            VALUES (
+                <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">,
+                <cfqueryparam value="#session.totalsum#" cfsqltype="cf_sql_integer">,
+                <cfqueryparam value="#arguments.form.addressId#" cfsqltype="cf_sql_integer">
+            )
+        </cfquery>
+
+        <cfset local.orderId = local.addOrderToTable.GENERATEDKEY>
+        <cfset session.orderId = local.orderId>
+
+        <cfloop query="arguments.items">            <!--- To insert order details in order details table --->
+            <cfset local.totalPrice = arguments.items.quantity * arguments.items.productPrice>
+            <cfquery name="local.addOrderDetails" datasource="#application.db#">
+                INSERT INTO 
+                    OrderDetails(
+                        OrderIdTable_orderId,
+                        Products_idProducts,
+                        quantity,
+                        totalPrice
+                    )
+                VALUES (
+                    <cfqueryparam value="#local.orderId#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#arguments.items.productId#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#arguments.items.quantity#" cfsqltype="cf_sql_integer">,
+                    <cfqueryparam value="#local.totalPrice#" cfsqltype="cf_sql_integer" />
+                )
+            </cfquery>
+        </cfloop>
+
+        <cfquery datasource="#application.db#">         <!--- To delete cart after order confirm --->
+            DELETE FROM 
+                cart
+            WHERE
+                User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer">
+                OR sessionId = <cfqueryparam value="#session.sessionid#" cfsqltype="cf_sql_varchar"> 
+        </cfquery>
+    </cffunction>
+
+
+    <cffunction  name="getOrderDetails" access="public" returntype="any">
+        
     </cffunction>
 
 
