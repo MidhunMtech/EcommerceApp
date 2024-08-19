@@ -28,7 +28,9 @@
                                 <a href="productDetails.cfm?id=#order.productId#">
                                     <img src="/images/thumbnail/#order.thumbnail#" alt="#order.thumbnail#" class="product-img img-thumbnail">
                                 </a>
-                                <button class="btn btn-primary invoice-btn ml-4">Download Invoice</button>
+                                <a href="invoice.cfm?ord=#order.orderId#">
+                                    <button class="btn btn-primary invoice-btn ml-4">Download Invoice</button>
+                                </a>
                             </div>
                             <div class="col-md-8">
                                 <h4>Product Name: <span class="text-primary">#order.productName#</span></h4>

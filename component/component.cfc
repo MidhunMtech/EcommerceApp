@@ -756,7 +756,9 @@
                 pdt.thumbnail AS thumbnail,
                 pdt.Price AS productPrice,
                 pdt.nameProduct AS productName,
-                adr.Address AS Address
+                adr.Address AS Address,
+                usr.Name AS userName,
+                usr.Email AS userEmail
             FROM
                 OrderIdTable AS ordId
             INNER JOIN
@@ -768,10 +770,15 @@
             INNER JOIN 
                 Address AS adr 
                 ON adr.idAddress = ordId.Address_idAddress
+            INNER JOIN 
+                User AS usr 
+                ON usr.idUser = ordId.User_idUser
             WHERE
                 ordId.User_idUser = <cfqueryparam value="#session.userId#" cfsqltype="cf_sql_integer" />
                 <cfif structKeyExists(url, "oid")>
                     AND ordDetails.idOrderDetails = <cfqueryparam value="#url.oid#" cfsqltype="cf_sql_integer">
+                <cfelseif structKeyExists(url, "ord")>
+                    AND ordId.orderId = <cfqueryparam value="#url.ord#" cfsqltype="cf_sql_integer">
                 </cfif>
         </cfquery>
 
@@ -789,7 +796,9 @@
                 "thumbnail" : local.getOrderDetails.thumbnail,
                 "productName" : local.getOrderDetails.productName,
                 "productPrice" : local.getOrderDetails.productPrice,
-                "Address" : local.getOrderDetails.Address
+                "Address" : local.getOrderDetails.Address,
+                "userName" : local.getOrderDetails.userName,
+                "userEmail" : local.getOrderDetails.userEmail
             }>
             <cfset arrayAppend(local.returnArray, local.orderStruct)>
         </cfloop>

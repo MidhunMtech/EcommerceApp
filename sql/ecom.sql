@@ -331,6 +331,7 @@ ENGINE = InnoDB;
 
 
 SELECT * FROM Rating;
+use ecommerce;
 
 
 
