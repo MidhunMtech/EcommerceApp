@@ -813,6 +813,7 @@
         <cfif structKeyExists(arguments, "form")>
             <cfquery name="local.getUserRating" datasource="#application.db#">      <!--- to check user rated this product or not --->
                 SELECT 
+                    idRating,
                     User_idUser,
                     Products_idProducts
                 FROM 
@@ -836,6 +837,15 @@
                         <cfqueryparam  value="#session.userId#" cfsqltype="cf_sql_integer" />
                     )
                 </cfquery>
+            <cfelse>
+                <cfquery name="local.updateRating" datasource="#application.db#">
+                    UPDATE 
+                        Rating
+                    SET
+                        productRating = <cfqueryparam  value="#arguments.form.rating#" cfsqltype="cf_sql_integer" />
+                    WHERE
+                        idRating = <cfqueryparam  value="#local.getUserRating.idRating#" cfsqltype="cf_sql_integer" />
+                </cfquery>
             </cfif>
             <cfset local.getRating = "">
         <cfelse>
@@ -854,11 +864,33 @@
     </cffunction>
 
 
+    <cffunction  name="ratingToShow" access="public" returnType="any">
+        <cfargument  name="proId" type="numeric" required="true">
+
+        <cfquery name="local.getRating" datasource="#application.db#">          <!--- To get rating by for each product --->
+            SELECT 
+                productRating,
+                Products_idProducts
+            FROM 
+                Rating
+            WHERE
+                Products_idProducts = <cfqueryparam  value="#arguments.proId#" cfsqltype="cf_sql_integer" />
+                AND User_idUser = <cfqueryparam  value="#session.userId#" cfsqltype="cf_sql_integer" />
+        </cfquery>
+        
+        <cfreturn local.getRating>
+    </cffunction>
+
+
     <cffunction  name="getCategories" access="remote" returnformat="JSON">
         <cfargument  name="catid" type="numeric" required="false">
         <cfargument  name="subid" type="numeric" required="false">
         <cfargument  name="proid" type="numeric" required="false">
         <cfargument  name="img" type="numeric" required="false">
+        <cfargument  name="filterVal" type="numeric" required="false">
+        <cfargument  name="sortVal" type="string" required="false">
+        <!--- <cfargument  name="filter" type="any" required="false">
+        <cfargument  name="sort" type="any" required="false"> --->
 
         <cfset local.CategoryArray = []>
         <cfset local.ProductArray = []>
@@ -934,13 +966,27 @@
                 <cfif structKeyExists(arguments, "imgid")>
                     AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
                 </cfif>
+                <cfif structKeyExists(arguments, "subid")>
+                    AND sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif structKeyExists(arguments, "filterVal")>
+                    <cfif arguments.filterVal EQ 0>
+                        AND pdt.Price <= 2000
+                    <cfelseif arguments.filterVal EQ 1>
+                        AND pdt.Price > 2000
+                    </cfif>
+                </cfif>
                 <cfif structKeyExists(url, "subid")>
                     AND sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
                 </cfif>
                 <cfif structKeyExists(url, "id")>
                     AND pdt.idProducts = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
                 </cfif>
-            ORDER BY productId
+            ORDER BY 
+                <cfif structKeyExists(arguments, "sortVal") AND arguments.sortVal NEQ "A">
+                    pdt.Price #arguments.sortVal# ,
+                </cfif>
+                productId
         </cfquery>
 
         <cfloop query="local.getProducts" group="productId">

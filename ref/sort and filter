@@ -1,0 +1,29 @@
+<cfif structKeyExists(form, "filterValue")>
+    - <cfdump  var="#form#" abort> -
+    <cfset result = application.component.getCategories(filter = form)>
+    <cfset variables.result = result>
+</cfif>
+<cfif structKeyExists(form, "sortValue")>
+    - <cfdump  var="#form#" abort> -
+    <cfset result = application.component.getCategories(sort = form)>
+    <cfset variables.result = result>
+</cfif>
+
+<div class="d-flex">
+    <form action="" method="post">
+        <select class="form-control d-inline-block w-auto mr-2" id="filter" name="filterValue" onchange="this.form.submit()">
+            <option value="" class="filter">Filter by</option>
+            <option value="0" class="filter">price < 2000</option>
+            <option value="1" class="filter">price > 2000</option>
+        </select>
+        <input type="hidden" name="subid" value="<cfoutput>#url.subid#</cfoutput>">
+    </form>
+    <form action="" method="post">
+        <select class="form-control d-inline-block w-auto" id="sort" onchange="this.form.submit()" name="sortValue">
+            <option>Sort by</option>
+            <option value="ASC">Price: Low to High</option>
+            <option value="DESC">Price: High to Low</option>
+        </select>
+    </form>
+</div>
+

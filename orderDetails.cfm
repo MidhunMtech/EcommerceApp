@@ -40,20 +40,28 @@
                                 <p><strong>Price:</strong> &##8377; #order.productPrice#</p>
                                 <p><strong>Total Price:</strong> &##8377; #order.productQuantityPrice#</p>
                                 <p><strong>Delivered Address:</strong> #order.Address#</p>
-                                <form action="" method="post" class="d-flex mt-3">
-                                    <label for="rateProduct"><b>Rate this product:</b></label>
-                                    <select id="rateProduct" class="form-control w-25 mx-3" name="rating">
-                                        <option value="1">1 Star</option>
-                                        <option value="2">2 Stars</option>
-                                        <option value="3">3 Stars</option>
-                                        <option value="4">4 Stars</option>
-                                        <option value="5">5 Stars</option>
-                                    </select>
-                                    <input type="hidden" value="#order.productId#" name="productId">
-                                    <button type="submit" name="rate" class="btn btn-danger">Rate</button>
-                                </form>
                             </div>
                         </cfloop>
+                        <cfset rateValue = 1>
+                        <cfinvoke  method="ratingToShow" component="component.component" returnVariable="rating">
+                            <cfinvokeargument  name="proId"  value="#order.productId#">
+                        </cfinvoke>
+                        <cfif rating.productRating NEQ ''>
+                            <cfset rateValue = rating.productRating>
+                        </cfif>
+                        <!--- <cfdump  var="#rateValue#"> --->
+                        <form action="" method="post" class="d-flex mt-3 col-md-8">
+                            <label for="rateProduct"><b>Rate this product:</b></label>
+                            <select id="rateProduct" class="form-control w-25 mx-3" name="rating">
+                                <option value="1" <cfif rateValue EQ 1>selected</cfif>>1 Star</option>
+                                <option value="2" <cfif rateValue EQ 2>selected</cfif>>2 Stars</option>
+                                <option value="3" <cfif rateValue EQ 3>selected</cfif>>3 Stars</option>
+                                <option value="4" <cfif rateValue EQ 4>selected</cfif>>4 Stars</option>
+                                <option value="5" <cfif rateValue EQ 5>selected</cfif>>5 Stars</option>
+                            </select>
+                            <input type="hidden" value="#order.productId#" name="productId">
+                            <button type="submit" name="rate" class="btn btn-danger">Rate</button>
+                        </form>
                     </cfoutput>
                 </div>
             </div>
