@@ -889,8 +889,7 @@
         <cfargument  name="img" type="numeric" required="false">
         <cfargument  name="filterVal" type="numeric" required="false">
         <cfargument  name="sortVal" type="string" required="false">
-        <!--- <cfargument  name="filter" type="any" required="false">
-        <cfargument  name="sort" type="any" required="false"> --->
+        <cfargument  name="searchValue" type="string" required="false">
 
         <cfset local.CategoryArray = []>
         <cfset local.ProductArray = []>
@@ -968,6 +967,10 @@
                 </cfif>
                 <cfif structKeyExists(arguments, "subid")>
                     AND sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif structKeyExists(arguments, "searchValue")>
+                    AND pdt.nameProduct LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
+                    OR sub.nameSubCategory LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
                 </cfif>
                 <cfif structKeyExists(arguments, "filterVal")>
                     <cfif arguments.filterVal EQ 0>

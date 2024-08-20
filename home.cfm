@@ -12,6 +12,10 @@
 
     <!-- Navbar -->
     <cfinclude  template="/navbar.cfm">
+    <!--- <cfif structKeyExists(form, "searchSubmit")>
+        <cfset getCat = application.component.getCategories(searchValue = form.searchValue)>
+        <!--- <cfdump  var="#result#"> --->
+    </cfif> --->
 
     <!-- Hero Section -->
     <div class="hero">
@@ -49,26 +53,6 @@
                     </cfif>
                 </cfoutput>
             </cfloop>
-            <!--- <div class="col-md-4">
-                <div class="card product-card">
-                    <img class="card-img-top" src="https://via.placeholder.com/350x200" alt="Product 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Product 2</h5>
-                        <p class="card-text">$29.99</p>
-                        <a href="#" class="btn btn-primary">Buy Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card product-card">
-                    <img class="card-img-top" src="https://via.placeholder.com/350x200" alt="Product 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Product 3</h5>
-                        <p class="card-text">$39.99</p>
-                        <a href="#" class="btn btn-primary">Buy Now</a>
-                    </div>
-                </div>
-            </div> --->
         </div>
     </div>
 

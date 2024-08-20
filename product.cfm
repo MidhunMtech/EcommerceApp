@@ -7,8 +7,6 @@
         <title>Product Listing Page</title>
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="/css/product.css">
-        <script src="/js/jquery.min.js"></script>
-        <script src="/js/product.js"></script>
     </head>
     <body>
         <cfinclude  template="/navbar.cfm">
@@ -27,17 +25,17 @@
 
                 <cfset val = val(form?.filterValue)> --->
 
-                        <select class="form-control d-inline-block w-auto mr-2" id="filter" name="filterValue">
-                            <option value="3" class="filter"<!---  <cfif val EQ 3>selected</cfif> --->>Filter by</option>
-                            <option value="0" class="filter">price < 2000</option>
-                            <option value="1" class="filter">price > 2000</option>
-                        </select>
+                <select class="form-control d-inline-block w-auto mr-2" id="filter" name="filterValue">
+                    <option value="3" class="filter"<!---  <cfif val EQ 3>selected</cfif> --->>Filter by</option>
+                    <option value="0" class="filter">price < 2000</option>
+                    <option value="1" class="filter">price > 2000</option>
+                </select>
 
-                        <select class="form-control d-inline-block w-auto" id="sort" name="sortValue">
-                            <option value="">Sort by</option>
-                            <option value="ASC">Price: Low to High</option>
-                            <option value="DESC">Price: High to Low</option>
-                        </select>
+                <select class="form-control d-inline-block w-auto" id="sort" name="sortValue">
+                    <option value="">Sort by</option>
+                    <option value="ASC">Price: Low to High</option>
+                    <option value="DESC">Price: High to Low</option>
+                </select>
                 </div>
             </div>
 
@@ -45,7 +43,7 @@
             <div id="productsContainer" class="row my-3">
                 <!-- Products will be appended here -->
             </div>
-                
+        </div>      
         <nav aria-label="Page navigation" class="mt-auto">
             <ul class="pagination justify-content-center">
             <li class="page-item"><a class="page-link" href="#">Previous</a></li>
@@ -57,5 +55,6 @@
         </nav>
         <cfinclude  template="/footer.cfm">
         <script src="/js/jquery.min.js"></script>
+        <script src="/js/product.js"></script>
     </body>
 </html>

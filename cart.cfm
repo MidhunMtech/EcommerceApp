@@ -39,8 +39,10 @@
                         <td>&##8377; #cart.productPrice#</td>
                         <td class="w-2">
                             <div class="d-flex align-items-center">
-                                <input type="number" class="form-control quantity-input quantityValue#cart.cartid#" value="#cart.quantity#" min="1">
-                                <button type="submit" class="btn btn-secondary btn-sm ml-3 quantityCart" data-userid="#cart.cartid#">Done</button>
+                                <!--- <form action=""> --->
+                                <input type="number" class="form-control quantity-input quantityValue#cart.cartid# quantityCart" value="#cart.quantity#" min="1" data-userid="#cart.cartid#" onchange="this.form.submit()">
+                                <!--- </form> --->
+                                <!--- <button type="submit" class="btn btn-secondary btn-sm ml-3 quantityCart" data-userid="#cart.cartid#">Done</button> --->
                             </div>
                         </td>
                         <cfset totalPrice = cart.productPrice * cart.quantity>
