@@ -1,0 +1,96 @@
+<cfquery name="local.getProducts" datasource="#application.db#">
+        SELECT
+            pdt.idProducts AS productId,
+            pdt.nameProduct AS productName,
+            pdt.Description AS productDescription,
+            pdt.Price AS productPrice,
+            pdt.thumbnail AS thumbnail,
+            sub.nameSubCategory AS subCategoryName,
+            sub.idSubcategory AS subCategoryId,
+            img.idproductImage AS imageId,
+            img.imageName AS imageName,
+            img.image_is_delete AS image_is_delete,
+            sub.Sub_Category_is_delete AS sub_is_delete
+        FROM 
+            Products AS pdt
+        INNER JOIN 
+            Sub_Category AS sub 
+            ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
+        LEFT JOIN 
+            productImage AS img
+            ON img.Products_idProducts = pdt.idProducts
+        WHERE
+            pdt.product_is_active = 1
+            <cfif structKeyExists(arguments, "proid")>
+                AND pdt.idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif structKeyExists(arguments, "imgid")>
+                AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif structKeyExists(arguments, "subid")>
+                AND sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif structKeyExists(arguments, "searchValue")>
+                AND (pdt.nameProduct LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
+                OR sub.nameSubCategory LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">)
+            </cfif>
+            <cfif structKeyExists(arguments, "filterVal")>
+                <cfif arguments.filterVal EQ 0>
+                    AND pdt.Price <= 2000
+                <cfelseif arguments.filterVal EQ 1>
+                    AND pdt.Price > 2000
+                </cfif>
+            </cfif>
+            <cfif structKeyExists(url, "subid")>
+                AND sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif structKeyExists(url, "id")>
+                AND pdt.idProducts = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
+            </cfif>
+        ORDER BY 
+            <cfif structKeyExists(arguments, "sortVal") AND arguments.sortVal NEQ "A">
+                pdt.Price #arguments.sortVal# ,
+            </cfif>
+            productId
+        LIMIT <cfqueryparam value="#startRow#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#rowsPerPage#" cfsqltype="cf_sql_integer">
+    </cfquery>
+
+    <!--- Initialize the return array --->
+    <!--- <cfset local.return = []> --->
+    <cfset local.productMap = {}>
+
+    <!--- Loop through the query and structure the products with images --->
+    <cfloop query="local.getProducts">
+        <!--- If the product is not already in the map, add it --->
+        <cfif NOT structKeyExists(local.productMap, local.getProducts.productId)>
+            <cfset local.productMap[local.getProducts.productId] = {
+                "productId" : local.getProducts.productId,
+                "productName" : local.getProducts.productName,
+                "productDescription" : local.getProducts.productDescription,
+                "productPrice" : local.getProducts.productPrice,
+                "subCategoryName" : local.getProducts.subCategoryName,
+                "subCategoryId" : local.getProducts.subCategoryId,
+                "sub_is_delete" : local.getProducts.sub_is_delete,
+                "thumbnail" : local.getProducts.thumbnail,
+                "image" : []
+            }>
+        </cfif>
+
+        <!--- Append the image details to the corresponding product --->
+        <cfif NOT isNull(local.getProducts.imageId)>
+            <cfset arrayAppend(local.productMap[local.getProducts.productId].image, {
+                "imageId" : local.getProducts.imageId,
+                "imageName" : local.getProducts.imageName,
+                "is_delete" : local.getProducts.image_is_delete
+            })>
+        </cfif>
+    </cfloop>
+
+    <!--- Convert the struct to an array and return it --->
+    <cfset local.ProductArray = []>
+    <cfloop array="#structKeyArray(local.productMap)#" index="key">
+        <cfset arrayAppend(local.ProductArray, local.productMap[key])>
+    </cfloop>
+    <cfset arrayAppend(local.return, local.ProductArray)>
+
+    <cfreturn local.return>

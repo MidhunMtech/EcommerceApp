@@ -98,8 +98,8 @@
                 <button class="btn btn-primary btn-sm" id="addImages">Add</button>
               </div>
               <div class="scrollable-column list-group">
-                <cfloop array="#getCat[2]#" index="img">
-                  <cfloop array="#img.image#" index="image">
+                <cfloop array="#getCat[3]#" index="image">
+                  <!--- <cfloop array="#img.image#" index="image"> --->
                     <cfif len(image.imageName) AND image.is_delete EQ 0>
                       <div class="list-group-item align-items-center">
                         <span>#image.imageName#</span>
@@ -108,7 +108,7 @@
                         <button class="btn btn-secondary btn-sm float-right editImage" data-userid="#image.imageId#">Edit</button>
                       </div>
                     </cfif>
-                  </cfloop>
+                  <!--- </cfloop> --->
                 </cfloop>
               </div>
             </div>

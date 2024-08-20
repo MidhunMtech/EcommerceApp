@@ -31,7 +31,7 @@
                     <div id="productCarousel" class="carousel slide" data-ride="carousel">
                         <div class="carousel-inner">
                             <cfset variables.active = "active">
-                            <cfloop array="#product.image#" index="image">
+                            <cfloop array="#getCat[3]#" index="image">
                                 <cfif image.is_delete EQ 0>
                                     <div class="carousel-item #variables.active#">
                                         <img src="/images/products/#image.imageName#" class="d-block w-100 imgProduct" alt="#image.imageName#">

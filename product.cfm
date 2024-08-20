@@ -1,4 +1,5 @@
 <!--- <cfinclude  template="addressAction.cfm"> --->
+<cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -44,13 +45,16 @@
                 <!-- Products will be appended here -->
             </div>
         </div>      
+        <cfset totalPages = Ceiling(getCat[4] / 6) - 1>
         <nav aria-label="Page navigation" class="mt-auto">
             <ul class="pagination justify-content-center">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            <cfoutput>
+                <!--- <li class="page-item classPreviuos"><button type="button" class="page-link pageNo" value="<cfif structKeyExists(url,"page") AND url.page GT 0>#url.page-1#<cfelse>0</cfif>">Previous</button></li> --->
+                <cfloop from="0" to="#totalPages#" index="i">
+                    <li class="page-item classPages"><button type="button" class="page-link pageNo" value="#i#">#i#</button></li>
+                </cfloop>
+                <!--- <li class="page-item classNext"><button type='button' class="page-link pageNo" value="<cfif structKeyExists(url,"page") AND url.page LT totalPages>#url.page+1#<cfelseif structKeyExists(url,"page") AND url.page EQ totalPages>#i-1#<cfelse>#i-totalPages#</cfif>">Next</button></li> --->
+            </cfoutput>
             </ul>
         </nav>
         <cfinclude  template="/footer.cfm">

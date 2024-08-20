@@ -333,6 +333,33 @@ ENGINE = InnoDB;
 SELECT * FROM Rating;
 use ecommerce;
 
+SELECT
+                distinct(pdt.idProducts) AS productId,
+                pdt.nameProduct AS productName,
+                pdt.Description AS productDescription,
+                pdt.Price AS productPrice,
+                pdt.thumbnail AS thumbnail,
+                sub.nameSubCategory AS subCategoryName,
+                sub.idSubcategory AS subCategoryId,
+                img.idproductImage AS imageId,
+                img.imageName AS imageName,
+                img.image_is_delete AS image_is_delete,
+                sub.Sub_Category_is_delete AS sub_is_delete
+            FROM 
+                Products AS pdt
+            INNER JOIN 
+                Sub_Category AS sub 
+                ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
+            LEFT JOIN 
+                productImage AS img
+                ON img.Products_idProducts = pdt.idProducts
+            WHERE
+                pdt.product_is_active = 1
+            ORDER BY 
+                productId
+            LIMIT 12, 6;
+        
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

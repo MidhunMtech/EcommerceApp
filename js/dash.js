@@ -126,11 +126,11 @@ $(document).ready(function() {
                 var imgData = JSON.parse(response);
                 console.log(imgData);
                 $('#EditImageModal').show();
-                $(".imgProductId").text(imgData[1][0].productName);
-                $(".imgProductId").val(imgData[1][0].productId);
-                $(".oldImg").text(imgData[1][0].image[0].imageName);
-                $(".oldImgName").val(imgData[1][0].image[0].imageName);
-                $(".imgId").val(imgData[1][0].image[0].imageId);
+                $(".imgProductId").text(imgData[2][0].productName);
+                $(".imgProductId").val(imgData[2][0].productId);
+                $(".oldImg").text(imgData[2][0].imageName);
+                $(".oldImgName").val(imgData[2][0].imageName);
+                $(".imgId").val(imgData[2][0].imageId);
             }
         });
     });

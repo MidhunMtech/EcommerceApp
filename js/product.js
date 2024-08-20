@@ -1,5 +1,5 @@
 $(document).ready(function() {    
-    function loadProducts(filterValue = 3, sortValue = "A", searchValue) {
+    function loadProducts(filterValue = 3, sortValue = "A", pageNo, searchValue) {
         let urlParams = new URLSearchParams(window.location.search);
         let subid = urlParams.get('subid');
         
@@ -10,6 +10,7 @@ $(document).ready(function() {
                 subid: subid,
                 filterVal: filterValue,
                 sortVal: sortValue,
+                pageNo: pageNo,
                 searchValue: searchValue
             },
             success: function(response) {
@@ -53,6 +54,16 @@ $(document).ready(function() {
         var sortVal = $("#sort").val();
         var currentFilterVal = $("#filter").val();
         loadProducts(currentFilterVal, sortVal); // Load products with the selected filter value
+    });
+
+    $(".pageNo").click(function() {
+        var currentFilterVal = $("#filter").val(); // Define currentFilterVal
+        var sortVal = $("#sort").val();
+        var pageNo = $(this).val();
+        console.log(pageNo);
+        
+        
+        loadProducts(currentFilterVal, sortVal, pageNo); // Load products with the selected filter, sort, and search values
     });
 
     // Handle search submit

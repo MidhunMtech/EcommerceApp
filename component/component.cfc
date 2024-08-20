@@ -890,10 +890,20 @@
         <cfargument  name="filterVal" type="numeric" required="false">
         <cfargument  name="sortVal" type="string" required="false">
         <cfargument  name="searchValue" type="string" required="false">
+        <cfargument  name="pageNo" type="numeric" required="false">
 
         <cfset local.CategoryArray = []>
         <cfset local.ProductArray = []>
+        <cfset local.ImageArray = []>
         <cfset local.return = []>
+        <cfif structKeyExists(arguments, "pageNo")>
+            <cfset local.page = arguments.pageNo>
+        <cfelse>
+            <cfset local.page = structKeyExists(URL, 'page') ? url.page : 0>
+        </cfif>
+        <cfset local.rowsPerPage = 6>
+        <cfset local.startRow = local.page * local.rowsPerPage  />
+
         <cfquery name="local.getCategory" datasource="#application.db#">        <!--- To get category an dsubcategory to show --->
             SELECT 
                 ctr.nameCategory AS categoryName,
@@ -936,41 +946,35 @@
         </cfloop>
         <cfset arrayAppend(local.return, local.CategoryArray)>
 
-        <cfquery name="local.getProducts" datasource="#application.db#">        <!--- To get sub-cat , Product And product image to show --->
+        <cfquery name="local.getProducts" datasource="#application.db#">
+            <!--- To get sub-cat, Product, and product image to show --->
             SELECT
-                distinct(pdt.idProducts) AS productId,
+                DISTINCT pdt.idProducts AS productId,
                 pdt.nameProduct AS productName,
                 pdt.Description AS productDescription,
                 pdt.Price AS productPrice,
                 pdt.thumbnail AS thumbnail,
                 sub.nameSubCategory AS subCategoryName,
                 sub.idSubcategory AS subCategoryId,
-                img.idproductImage AS imageId,
-                img.imageName AS imageName,
-                img.image_is_delete AS image_is_delete,
                 sub.Sub_Category_is_delete AS sub_is_delete
             FROM 
                 Products AS pdt
             INNER JOIN 
                 Sub_Category AS sub 
                 ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
-            LEFT JOIN 
-                productImage AS img
-                ON img.Products_idProducts = pdt.idProducts
             WHERE
                 pdt.product_is_active = 1
                 <cfif structKeyExists(arguments, "proid")>
                     AND pdt.idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
                 </cfif>
-                <cfif structKeyExists(arguments, "imgid")>
-                    AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
-                </cfif>
                 <cfif structKeyExists(arguments, "subid")>
                     AND sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
                 </cfif>
                 <cfif structKeyExists(arguments, "searchValue")>
-                    AND pdt.nameProduct LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
-                    OR sub.nameSubCategory LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
+                    AND (
+                        pdt.nameProduct LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar"> OR
+                        sub.nameSubCategory LIKE <cfqueryparam value="%#arguments.searchValue#%" cfsqltype="cf_sql_varchar">
+                    )
                 </cfif>
                 <cfif structKeyExists(arguments, "filterVal")>
                     <cfif arguments.filterVal EQ 0>
@@ -987,10 +991,15 @@
                 </cfif>
             ORDER BY 
                 <cfif structKeyExists(arguments, "sortVal") AND arguments.sortVal NEQ "A">
-                    pdt.Price #arguments.sortVal# ,
+                    pdt.Price #arguments.sortVal# AND
                 </cfif>
-                productId
+                pdt.idProducts
+            <cfif structKeyExists(session, "adminid") OR  structKeyExists(arguments, "searchValue")>
+            <cfelse>
+                LIMIT <cfqueryparam value="#local.startRow#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#local.rowsPerPage#" cfsqltype="cf_sql_integer">
+            </cfif>
         </cfquery>
+
 
         <cfloop query="local.getProducts" group="productId">
             <cfset local.structProduct = {
@@ -1001,20 +1010,69 @@
                 "subCategoryName" : local.getProducts.subCategoryName,
                 "subCategoryId" : local.getProducts.subCategoryId,
                 "sub_is_delete" : local.getProducts.sub_is_delete,
-                "thumbnail" : local.getProducts.thumbnail,
-                "image" : []
+                "thumbnail" : local.getProducts.thumbnail <!--- ,
+                "image" : [] --->
             }>
-            <cfloop>
+            <!--- <cfloop>
                 <cfset local.imageStruct ={
                     "imageId" : local.getProducts.imageId,
                     "imageName" : local.getProducts.imageName,
                     "is_delete" : local.getProducts.image_is_delete
                 }>
                 <cfset arrayAppend(local.structProduct.image, local.imageStruct)>
-            </cfloop>
+            </cfloop> --->
             <cfset arrayAppend(local.ProductArray, local.structProduct)>
         </cfloop>
         <cfset arrayAppend(local.return, local.ProductArray)>
+
+        <cfquery name="local.getImages" datasource="#application.db#">
+            SELECT 
+                img.idproductImage AS imageId,
+                img.imageName AS imageName,
+                img.image_is_delete AS image_is_delete,
+                img.Products_idProducts AS productId,
+                pdt.nameProduct AS productName
+            FROM 
+                productImage AS img
+            INNER JOIN 
+                Products AS pdt
+                ON img.Products_idProducts = pdt.idProducts
+            WHERE
+                img.image_is_delete = 0
+                <cfif structKeyExists(url, "id")>
+                    AND img.Products_idProducts = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif structKeyExists(arguments, "imgid")>
+                    AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
+                </cfif>
+        </cfquery>
+        <cfloop query="local.getImages">
+                <cfset local.imageStruct ={
+                    "imageId" : local.getImages.imageId,
+                    "imageName" : local.getImages.imageName,
+                    "is_delete" : local.getImages.image_is_delete,
+                    "productId" : local.getImages.productId,
+                    "productName" : local.getImages.productName
+                }>
+                <cfset arrayAppend(local.ImageArray, local.imageStruct)>
+            </cfloop>
+        <cfset arrayAppend(local.return, local.ImageArray)>
+
+        <cfquery name="local.getProductsCount" datasource="#application.db#">        <!--- To get sub-cat , Product And product image to show --->
+            SELECT
+                COUNT(pdt.idProducts) AS productId
+            FROM
+                Products AS pdt
+            INNER JOIN 
+                Sub_Category AS sub 
+                ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
+            <cfif structKeyExists(url, "subid")>
+                WHERE
+                    sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+            </cfif>
+        </cfquery>
+        <cfset arrayAppend(local.return, local.getProductsCount.productId)>
+
         <cfreturn local.return>
     </cffunction>
 

@@ -35,7 +35,7 @@
                         <!-- Product Card -->
                     <div id="productsContainer" class="row my-3">
                         <cfloop array="#product[2]#" index="product">
-                            <div class="col-md-4">
+                            <div class="col-md-4 my-3">
                                 <div class="card product-card">
                                     <a href="productDetails.cfm?id=#product.productId#" class="productLink">
                                         <img class="card-img-top productImage" src="/images/thumbnail/#product.thumbnail#" alt="#product.productName#" height="150">
@@ -52,7 +52,7 @@
                 </div>
             </cfoutput>
                     
-            <nav aria-label="Page navigation" class="mt-auto">
+            <!--- <nav aria-label="Page navigation" class="mt-auto">
                 <ul class="pagination justify-content-center">
                 <li class="page-item"><a class="page-link" href="#">Previous</a></li>
                 <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -60,7 +60,7 @@
                 <li class="page-item"><a class="page-link" href="#">3</a></li>
                 <li class="page-item"><a class="page-link" href="#">Next</a></li>
                 </ul>
-            </nav>
+            </nav> --->
             <cfinclude  template="/footer.cfm">
             <script src="/js/jquery.min.js"></script>
             <script src="/js/product.js"></script>
