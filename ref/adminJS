@@ -1,0 +1,70 @@
+thumbnail
+
+                let imageNameHtml = `
+                    <div class="list-group-item align-items-center">
+                        <span class="imageName">${proData[1][i].thumbnail}</span>
+                        <button class="btn btn-secondary btn-sm float-right editThumbnail" data-userid="${proData[2][i].imageId}">Edit</button>
+                    </div>
+                `;
+                $('.image-container').append(imageNameHtml);
+
+
+
+edit product
+
+ $(".editProduct").click(function() {
+        var proid = $(this).data('userid');
+        $.ajax({
+            url: '../component/component.cfc?method=getCategories',
+            method: 'GET',
+            data: {
+                proid : proid
+            },
+            success: function(response) {
+                var proData = JSON.parse(response);
+                $('#editProductModal').show(); 
+                console.log(proData);
+                $('.pro_subcat').text(proData[1][0].subCategoryName);
+                $('.pro_subcat').val(proData[1][0].subCategoryId);
+                $('.productName').val(proData[1][0].productName);
+                $('.productDesc').val(proData[1][0].productDescription);
+                $('.productPrice').val(proData[1][0].productPrice);
+                $('.productId').val(proData[1][0].productId);
+
+                for (i in proData[2]) {
+                    console.log(proData[2][i].imageId);
+                    let imageNameHtml = `
+                        <div class="list-group-item align-items-center">
+                            <span class="imageName">${proData[2][i].imageName}</span>
+                            <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="${proData[2][i].imageId}">Delete</button>
+                            <button class="btn btn-secondary btn-sm float-right editImage" data-userid="${proData[2][i].imageId}">Edit</button>
+                        </div>
+                    `;
+                    $('.image-container').append(imageNameHtml);
+                    console.log(proData[2][i].imageName);
+                }                
+            }
+        });
+
+        $(".editImage").click(function() { 
+            $('#editProductModal').hide();
+            var imgid = $(this).data('userid');
+            $.ajax({
+                url: '../component/component.cfc?method=getCategories',
+                method: 'GET',
+                data: {
+                    imgid : imgid
+                },
+                success: function(response) {
+                    var imgData = JSON.parse(response);
+                    console.log(imgData);
+                    $('#EditImageModal').show();
+                    $(".imgProductId").text(imgData[2][0].productName);
+                    $(".imgProductId").val(imgData[2][0].productId);
+                    $(".oldImg").text(imgData[2][0].imageName);
+                    $(".oldImgName").val(imgData[2][0].imageName);
+                    $(".imgId").val(imgData[2][0].imageId);
+                }
+            });
+        });
+    }); 

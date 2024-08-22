@@ -52,6 +52,23 @@ $(document).ready(function() {
     });
 
 
+    $('#add-image').on('click', function() {  //for adding images for product..
+        const newImageInput = $('<input>', {
+            type: 'file',
+            class: 'form-control-file',
+            name: 'images',  // Use the array syntax for multiple files
+            accept: 'image/*',
+            required: true
+        });
+
+        const newLabel = $('<label>', {
+            text: 'Images:'
+        });
+
+        $('#image-container').append(newLabel).append(newImageInput);
+    });
+
+
     $(".editCategory").click(function() {
         var catid = $(this).data('userid');
         $.ajax({
@@ -98,23 +115,98 @@ $(document).ready(function() {
             url: '../component/component.cfc?method=getCategories',
             method: 'GET',
             data: {
-                proid : proid
+                proid: proid
             },
             success: function(response) {
                 var proData = JSON.parse(response);
                 $('#editProductModal').show(); 
                 console.log(proData);
+    
+                // Populate product details
                 $('.pro_subcat').text(proData[1][0].subCategoryName);
                 $('.pro_subcat').val(proData[1][0].subCategoryId);
                 $('.productName').val(proData[1][0].productName);
                 $('.productDesc').val(proData[1][0].productDescription);
                 $('.productPrice').val(proData[1][0].productPrice);
                 $('.productId').val(proData[1][0].productId);
+    
+                // Clear the image container before appending new data
+                $('.image-container').empty();
+    
+                for (var i in proData[2]) {
+                    let imageNameHtml = `
+                        <div class="list-group-item align-items-center">
+                            <span class="imageName">${proData[2][i].imageName}</span>
+                            <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="${proData[2][i].imageId}">Delete</button>
+                            <button class="btn btn-secondary btn-sm float-right editImage" data-userid="${proData[2][i].imageId}">Edit</button>
+                        </div>
+                    `;
+                    $('.image-container').append(imageNameHtml);
+                }
             }
         });
     });
+    
+    // Event delegation for dynamically generated editImage buttons
+    $('.image-container').on('click', '.editImage', function(event) {
+        // Prevent the default behavior (page reload)
+        event.preventDefault();
+    
+        // Hide the product modal
+        $('#editProductModal').hide();
+    
+        // Get the image ID
+        var imgid = $(this).data('userid');
+    
+        // Make the AJAX request to fetch image data
+        $.ajax({
+            url: '../component/component.cfc?method=getCategories',
+            method: 'GET',
+            data: {
+                imgid: imgid
+            },
+            success: function(response) {
+                var imgData = JSON.parse(response);
+                console.log(imgData);
+    
+                // Show the image edit modal
+                $('#EditImageModal').show();
+    
+                // Populate the modal with the image data
+                $(".imgProductId").text(imgData[2][0].productName);
+                $(".imgProductId").val(imgData[2][0].productId);
+                $(".oldImg").text(imgData[2][0].imageName);
+                $(".oldImgName").val(imgData[2][0].imageName);
+                $(".imgId").val(imgData[2][0].imageId);
+            }
+        });
+    });
+    
+    $('.image-container').on('click', '.deleteImage', function(event) {
+        // Prevent the default behavior (page reload)
+        event.preventDefault();
+    
+        // Hide the product modal
+        $('#editProductModal').hide();
 
-    $(".editImage").click(function() { 
+        var imgid = $(this).data('userid');
+        if (confirm("Are you sure you want to delete this?")) {
+            $.ajax({
+                url: '../component/component.cfc?method=deleteProduct',
+                method: 'POST',
+                data: {
+                    imgid: imgid
+                },
+                success: function(response) {
+                    window.location.href = 'adminDash.cfm';
+                }
+            });
+        }
+    });
+    
+
+
+    /* $(".editImage").click(function() { 
         var imgid = $(this).data('userid');
         $.ajax({
             url: '../component/component.cfc?method=getCategories',
@@ -133,10 +225,12 @@ $(document).ready(function() {
                 $(".imgId").val(imgData[2][0].imageId);
             }
         });
-    });
+    }); */
+
+    
 
     function deleteItem(itemType, itemId) {
-        if (confirm("Are you sure you want to delete this user?")) {
+        if (confirm("Are you sure you want to delete this?")) {
             $.ajax({
                 url: '../component/component.cfc?method=deleteProduct',
                 method: 'POST',
@@ -165,10 +259,10 @@ $(document).ready(function() {
         deleteItem('catid', catid);
     });
 
-    $(".deleteImage").click(function() { 
+    /* $(".deleteImage").click(function() { 
         var imgid = $(this).data('userid');
         deleteItem('imgid', imgid);
-    });
+    }); */
     
 
     /* $(".deleteImage").click(function() { 

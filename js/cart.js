@@ -9,7 +9,7 @@ $(document).ready(function() {
                     cartid : cartid  
                 },
                 success: function(response) {
-                    window.location.href = '/cart.cfm';
+                    window.location.href = '/cart';
                 }
             });
         }
@@ -26,7 +26,7 @@ $(document).ready(function() {
                 quantityid : quantityid
             },
             success: function(response) {
-                window.location.href = '/cart.cfm';
+                window.location.href = '/cart';
             }
         });
     });

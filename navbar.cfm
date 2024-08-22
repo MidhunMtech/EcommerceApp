@@ -1,6 +1,7 @@
 
 <cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
-<script src="js/home.js" defer></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/home.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -43,7 +44,7 @@
                 </ul>
             </li>
             <li class="nav-item active mx-2">
-                <a class="nav-link" href="/cart.cfm"><b><i class="bi bi-cart"></i>Cart</b></a>
+                <a class="nav-link" href="/cart"><b><i class="bi bi-cart"></i>Cart</b></a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="/profile.cfm"><i class="bi bi-person-circle"></i></a>

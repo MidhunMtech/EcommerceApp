@@ -192,7 +192,6 @@ ENGINE = InnoDB;
 select * from Products;
 -- truncate table Products;
 
-
 -- update Products
 -- set
 -- product_is_active = 1;
@@ -216,6 +215,8 @@ ENGINE = InnoDB;
 
 select * from productImage;
 -- truncate table productImage;
+
+
 
 
 -- -----------------------------------------------------

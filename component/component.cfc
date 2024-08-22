@@ -265,14 +265,14 @@
         </cfif>
 
         <cfif structKeyExists(form, "productName")>             <!--- Adding Products --->
-            <cfset uploadDirectory = expandpath('/images/thumbnail')>
+            <cfset thumbnailDirectory = expandpath('/images/thumbnail')>
             <cffile  action="upload"
-                destination="#uploadDirectory#" 
+                destination="#thumbnailDirectory#" 
                 fileField="form.thumbnail" 
                 nameConflict="makeunique">
             <cfset local.thumbnail = cffile.serverfile>
 
-            <cfquery name="local.addProducts" datasource="#application.db#">
+            <cfquery name="local.addProducts" datasource="#application.db#" result="local.getProductId">
                 INSERT INTO 
                     Products (
                         nameProduct,
@@ -292,6 +292,36 @@
                     <cfqueryparam value="#local.thumbnail#" cfsqltype="cf_sql_varchar">
                 )
             </cfquery>
+
+            <cfset local.productId = local.getProductId.GENERATEDKEY>
+
+            <cfif structKeyExists(form, "images")>            <!--- Adding Image for products --->
+                <cfset imageDirectory = expandpath('/images/products')>
+                <cffile  action="uploadAll"
+                    destination="#imageDirectory#" 
+                    fileField="form.images" 
+                    nameConflict="makeunique">
+                <cfset local.productImg = []>
+                <cfloop array="#cffile.UPLOADALLRESULTS#" index="img">
+                    <cfset arrayAppend(local.productImg, img.serverfile)>
+                </cfloop>
+                <!--- <cfset local.proImage = cffile.serverfile> --->
+
+                <cfquery name="local.addImages" datasource="#application.db#">
+                    INSERT INTO 
+                        productImage (
+                            imageName,
+                            Products_idProducts
+                        )
+                    VALUES 
+                    <cfloop from="1" to="#arrayLen(local.productImg)#" index="i">
+                        (
+                            <cfqueryparam value="#local.productImg[i]#" cfsqltype="cf_sql_varchar">,
+                            <cfqueryparam value="#local.productId#" cfsqltype="cf_sql_integer">
+                        )<cfif i EQ arrayLen(local.productImg)><cfelse>,</cfif>
+                    </cfloop>
+                </cfquery>
+            </cfif>
         </cfif>
 
         <cfif structKeyExists(form, "pro_productName") AND structKeyExists(form, "pro_productId")>      <!--- Edit Products --->
@@ -308,7 +338,7 @@
             </cfquery>
         </cfif>
 
-        <cfif structKeyExists(form, "productImage")>            <!--- Adding Image for products --->
+        <!--- <cfif structKeyExists(form, "productImage")>            <!-- Adding Image for products -->
             <cfset uploadDirectory = expandpath('/images/products')>
             <cffile  action="upload"
                 destination="#uploadDirectory#" 
@@ -327,7 +357,7 @@
                     <cfqueryparam value="#arguments.form.productId#" cfsqltype="cf_sql_integer">
                 )
             </cfquery>
-        </cfif>
+        </cfif> --->
 
         <cfif structKeyExists(form, "img_imageName") AND structKeyExists(form, "img_imageId")>      <!--- Edit Images --->
             <cfif len(arguments.form.img_imageName)>
@@ -991,10 +1021,11 @@
                 </cfif>
             ORDER BY 
                 <cfif structKeyExists(arguments, "sortVal") AND arguments.sortVal NEQ "A">
-                    pdt.Price #arguments.sortVal# AND
+                    pdt.Price #arguments.sortVal#
+                <cfelse>
+                    pdt.idProducts
                 </cfif>
-                pdt.idProducts
-            <cfif structKeyExists(session, "adminid") OR  structKeyExists(arguments, "searchValue")>
+            <cfif structKeyExists(session, "adminid") OR  (structKeyExists(arguments, "searchValue") AND len(arguments.searchValue))>
             <cfelse>
                 LIMIT <cfqueryparam value="#local.startRow#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#local.rowsPerPage#" cfsqltype="cf_sql_integer">
             </cfif>
@@ -1044,6 +1075,9 @@
                 </cfif>
                 <cfif structKeyExists(arguments, "imgid")>
                     AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif structKeyExists(arguments, "proid")>
+                    AND pdt.idProducts = <cfqueryparam value="#arguments.proid#" cfsqltype="cf_sql_integer">
                 </cfif>
         </cfquery>
         <cfloop query="local.getImages">

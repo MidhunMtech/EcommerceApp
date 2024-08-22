@@ -8,4 +8,4 @@ $(document).ready(function () {
     $('.dropdown').on("hide.bs.dropdown", function () {
       $('.dropdown-menu').hide();
     });
-  });
+});

@@ -9,8 +9,6 @@
     <title>Product Details</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/product.css" rel="stylesheet">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/productDetails.js"></script>
 </head>
 <body>
 <cfinclude  template="/navbar.cfm">
@@ -23,8 +21,6 @@
                     <cfif rating.Products_idProducts EQ product.productId>
                         <cfset productRating = rating.proRating>
                     </cfif>
-                    <!--- <cfdump  var="#rating.Products_idProducts#">
-                    <cfdump  var="#product.productId#"> --->
                 </cfloop>
                 <div class="col-md-6">
                 <!-- Carousel for Product Images -->
@@ -72,5 +68,6 @@
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <cfinclude  template="/footer.cfm">
 <script src="/js/jquery.min.js"></script>
+<script src="/js/productDetails.js"></script>
 </body>
 </html>

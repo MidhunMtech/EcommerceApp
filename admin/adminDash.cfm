@@ -31,9 +31,9 @@
       </nav>
       <div class="container-fluid">
         <div class="row">
-          <!-- Column 1 -->
           <cfoutput>
-            <div class="col-md-3">
+            <!-- Column 1 -->
+            <div class="col-md-4">
               <div class="column-heading">
                 <h5>Category</h5><span class="sort-by"></span>
                 <button class="btn btn-primary btn-sm" id="addCategory">Add</button>
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Column 2 -->
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="column-heading">
                 <h5>Sub-Category</h5><span class="sort-by"></span>
                 <button class="btn btn-primary btn-sm" id="addSubCategory">Add</button>
@@ -73,7 +73,7 @@
             </div>
 
             <!-- Column 3 -->
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="column-heading">
                 <h5>Products</h5><span class="sort-by"></span>
                 <button class="btn btn-primary btn-sm" id="addProducts">Add</button>
@@ -92,7 +92,7 @@
             </div>
 
             <!-- Column 4 -->
-            <div class="col-md-3">
+            <!--- <div class="col-md-3">
               <div class="column-heading">
                 <h5>Images</h5><span class="sort-by"></span>
                 <button class="btn btn-primary btn-sm" id="addImages">Add</button>
@@ -101,17 +101,17 @@
                 <cfloop array="#getCat[3]#" index="image">
                   <!--- <cfloop array="#img.image#" index="image"> --->
                     <cfif len(image.imageName) AND image.is_delete EQ 0>
-                      <div class="list-group-item align-items-center">
+                      <!--- <div class="list-group-item align-items-center">
                         <span>#image.imageName#</span>
                         <!--- <a href="" class="btn btn-light btn-sm float-right">Sortby</a> --->
                         <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="#image.imageId#">Delete</button>
                         <button class="btn btn-secondary btn-sm float-right editImage" data-userid="#image.imageId#">Edit</button>
-                      </div>
+                      </div> --->
                     </cfif>
                   <!--- </cfloop> --->
                 </cfloop>
               </div>
-            </div>
+            </div> --->
           </div>
         </div>
 
@@ -194,10 +194,19 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="image">Thumbnail:</label>
-                  <input type="file" class="form-control-file" id="image" name="thumbnail" accept="image/*" required>
+                  <label for="thumbnail">Thumbnail:</label>
+                  <input type="file" class="form-control-file" id="thumbnail" name="thumbnail" accept="image/*" required>
                 </div>
                 
+                <div class="form-group" id="image-container">
+                  <label for="image">Images:</label>
+                  <input type="file" class="form-control-file" id="image" name="images" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                  <button type="button" class="btn btn-primary" id="add-image">Add Another Image</button>
+                </div>
+
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary categoryClose">Close</button>
                   <button type="submit" class="btn btn-success" name="submit">Add</button>
@@ -206,7 +215,7 @@
             </div>
           </div>
 
-          <div id="addImageModal" class="modal"> <!-- Add Image -->
+          <!--- <div id="addImageModal" class="modal"> <!-- Add Image -->
             <div class="modal-content">
               <span class="close">&times;</span>
               <form action="" method="post" id="editForm" enctype="multipart/form-data">
@@ -231,7 +240,7 @@
                 </div>
               </form>
             </div>
-          </div>
+          </div> --->
 
           <div id="editCategoryModal" class="modal"> <!-- Edit Category -->
             <div class="modal-content">
@@ -313,10 +322,16 @@
                   <input type="number" class="form-control productPrice" name="pro_productPrice" min="0" step="0.01" >
                 </div>
 
-                <!--- <div class="form-group">
-                  <label for="image">Image:</label>
-                  <input type="file" class="form-control-file" name="image" accept="image/*" >
-                </div> --->
+                <div class="form-group">
+                  <label for="thumbnail">Thumbnail:</label>
+                  <div class="thumbnail-container"></div>
+                  <input type="file" class="form-control-file productThumbnail" name="pro_thumbnail" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                  <label for="image">Images:</label>
+                  <div class="image-container"></div>
+                </div>
 
                 <input type="hidden" class="form-control productId" name="pro_productId" >
 
