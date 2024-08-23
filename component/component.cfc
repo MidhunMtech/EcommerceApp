@@ -1116,7 +1116,7 @@
             WHERE
                 pdt.product_is_active = 1
             <cfif structKeyExists(url, "subid")>
-                sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+                AND sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
             </cfif>
         </cfquery>
         <cfset arrayAppend(local.return, local.getProductsCount.productId)>
