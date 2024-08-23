@@ -1,5 +1,5 @@
 
-<cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
+<cfinvoke  method="getCategories" component="component.component" returnVariable="getCategory">
 <script src="/js/jquery.min.js"></script>
 <script src="/js/home.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
@@ -30,7 +30,7 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <cfoutput>
-                        <cfloop array="#getCat[1]#" index="cat">
+                        <cfloop array="#getCategory[1]#" index="cat">
                             <li class="dropdown-submenu dropleft">
                                 <a class="dropdown-item dropdown-toggle" href="">#cat.categoryName#</a>
                                 <ul class="dropdown-menu">

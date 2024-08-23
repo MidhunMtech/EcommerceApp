@@ -929,7 +929,8 @@
         <cfargument  name="catid" type="numeric" required="false">
         <cfargument  name="subid" type="numeric" required="false">
         <cfargument  name="proid" type="numeric" required="false">
-        <!--- <cfargument  name="id" type="numeric" required="false"> --->
+        <cfargument  name="id" type="numeric" required="false">
+        <cfargument  name="subCatId" type="numeric" required="false">
         <cfargument  name="img" type="numeric" required="false">
         <cfargument  name="filterVal" type="numeric" required="false">
         <cfargument  name="sortVal" type="string" required="false">
@@ -1027,11 +1028,11 @@
                         AND pdt.Price > 2000
                     </cfif>
                 </cfif>
-                <cfif structKeyExists(url, "subid")>
-                    AND sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+                <cfif structKeyExists(arguments, "subCatId")>
+                    AND sub.idSubcategory = <cfqueryparam value="#arguments.subCatId#" cfsqltype="cf_sql_integer">
                 </cfif>
-                <cfif structKeyExists(url, "id")>
-                    AND pdt.idProducts = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
+                <cfif structKeyExists(arguments, "id")>
+                    AND pdt.idProducts = <cfqueryparam value="#arguments.id#" cfsqltype="cf_sql_integer">
                 </cfif>
             ORDER BY 
                 <cfif structKeyExists(arguments, "sortVal") AND arguments.sortVal NEQ "A">
@@ -1083,8 +1084,8 @@
                 ON img.Products_idProducts = pdt.idProducts
             WHERE
                 img.image_is_delete = 0
-                <cfif structKeyExists(url, "id")>
-                    AND img.Products_idProducts = <cfqueryparam value="#url.id#" cfsqltype="cf_sql_integer">
+                <cfif structKeyExists(arguments, "id")>
+                    AND img.Products_idProducts = <cfqueryparam value="#arguments.id#" cfsqltype="cf_sql_integer">
                 </cfif>
                 <cfif structKeyExists(arguments, "imgid")>
                     AND img.idproductImage = <cfqueryparam value="#arguments.imgid#" cfsqltype="cf_sql_integer">
@@ -1115,8 +1116,8 @@
                 ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
             WHERE
                 pdt.product_is_active = 1
-            <cfif structKeyExists(url, "subid")>
-                AND sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+            <cfif structKeyExists(arguments, "subCatId")>
+                AND sub.idSubcategory = <cfqueryparam value="#arguments.subCatId#" cfsqltype="cf_sql_integer">
             </cfif>
         </cfquery>
         <cfset arrayAppend(local.return, local.getProductsCount.productId)>

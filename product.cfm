@@ -1,5 +1,7 @@
 <!--- <cfinclude  template="addressAction.cfm"> --->
 <cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
+    <cfinvokeargument  name="subCatId"  value="#url.subid#">
+</cfinvoke>
 <!DOCTYPE html>
 <html lang="en">
     <head>
