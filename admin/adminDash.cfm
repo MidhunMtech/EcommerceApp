@@ -23,7 +23,7 @@
     <body>
       <nav class="navbar navbar-expand-lg bg-body-tertiary mb-3 ">
         <div class="container-fluid">
-          <a class="navbar-brand" href="?logout=Atrue">Logout</a>
+          <a class="btn btn-secondary btn-sm" href="?logout=Atrue">Logout</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -76,7 +76,8 @@
             <div class="col-md-4">
               <div class="column-heading">
                 <h5>Products</h5><span class="sort-by"></span>
-                <button class="btn btn-primary btn-sm" id="addProducts">Add</button>
+                <button class="btn btn-primary btn-sm" id="addProducts">Add Products</button>
+                <button class="btn btn-primary btn-sm" id="addImages">Add Images</button>
               </div>
               <div class="scrollable-column list-group">
                 <cfloop array="#getCat[2]#" index="product">
@@ -215,7 +216,7 @@
             </div>
           </div>
 
-          <!--- <div id="addImageModal" class="modal"> <!-- Add Image -->
+          <div id="addImageModal" class="modal"> <!-- Add Image -->
             <div class="modal-content">
               <span class="close">&times;</span>
               <form action="" method="post" id="editForm" enctype="multipart/form-data">
@@ -240,7 +241,7 @@
                 </div>
               </form>
             </div>
-          </div> --->
+          </div>
 
           <div id="editCategoryModal" class="modal"> <!-- Edit Category -->
             <div class="modal-content">

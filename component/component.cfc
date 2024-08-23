@@ -325,6 +325,16 @@
         </cfif>
 
         <cfif structKeyExists(form, "pro_productName") AND structKeyExists(form, "pro_productId")>      <!--- Edit Products --->
+
+            <cfif structKeyExists(form, "pro_thumbnail")>
+                <cfset thumbnailDirectory = expandpath('/images/thumbnail')>
+                <cffile  action="upload"
+                    destination="#thumbnailDirectory#" 
+                    fileField="form.pro_thumbnail" 
+                    nameConflict="makeunique">
+                <cfset local.pro_thumbnail = cffile.serverfile>
+            </cfif>
+
             <cfquery name="local.editProducts" datasource="#application.db#">
                 UPDATE 
                     Products
@@ -333,12 +343,15 @@
                     Description = <cfqueryparam value="#arguments.form.pro_productDesc#" cfsqltype="cf_sql_varchar">,
                     Price = <cfqueryparam value="#arguments.form.pro_productPrice#" cfsqltype="cf_sql_integer">,
                     Sub_Category_idSubcategory = <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">
+                    <cfif structKeyExists(form, "pro_thumbnail")>
+                    , thumbnail = <cfqueryparam value="#local.pro_thumbnail#" cfsqltype="cf_sql_varchar">
+                    </cfif>
                 WHERE
                     idProducts = <cfqueryparam value="#arguments.form.pro_productId#" cfsqltype="cf_sql_integer">
             </cfquery>
         </cfif>
 
-        <!--- <cfif structKeyExists(form, "productImage")>            <!-- Adding Image for products -->
+        <cfif structKeyExists(form, "productImage")>            <!-- Adding Image for products -->
             <cfset uploadDirectory = expandpath('/images/products')>
             <cffile  action="upload"
                 destination="#uploadDirectory#" 
@@ -357,7 +370,7 @@
                     <cfqueryparam value="#arguments.form.productId#" cfsqltype="cf_sql_integer">
                 )
             </cfquery>
-        </cfif> --->
+        </cfif>
 
         <cfif structKeyExists(form, "img_imageName") AND structKeyExists(form, "img_imageId")>      <!--- Edit Images --->
             <cfif len(arguments.form.img_imageName)>
@@ -916,6 +929,7 @@
         <cfargument  name="catid" type="numeric" required="false">
         <cfargument  name="subid" type="numeric" required="false">
         <cfargument  name="proid" type="numeric" required="false">
+        <!--- <cfargument  name="id" type="numeric" required="false"> --->
         <cfargument  name="img" type="numeric" required="false">
         <cfargument  name="filterVal" type="numeric" required="false">
         <cfargument  name="sortVal" type="string" required="false">
@@ -934,7 +948,7 @@
         <cfset local.rowsPerPage = 6>
         <cfset local.startRow = local.page * local.rowsPerPage  />
 
-        <cfquery name="local.getCategory" datasource="#application.db#">        <!--- To get category an dsubcategory to show --->
+        <cfquery name="local.getCategory" datasource="#application.db#">        <!--- To get category an subcategory to show --->
             SELECT 
                 ctr.nameCategory AS categoryName,
                 ctr.idCategory AS categoryId,
@@ -976,7 +990,7 @@
         </cfloop>
         <cfset arrayAppend(local.return, local.CategoryArray)>
 
-        <cfquery name="local.getProducts" datasource="#application.db#">
+        <cfquery name="local.getProducts" datasource="#application.db#">        <!--- Products --->
             <!--- To get sub-cat, Product, and product image to show --->
             SELECT
                 DISTINCT pdt.idProducts AS productId,
@@ -1031,7 +1045,6 @@
             </cfif>
         </cfquery>
 
-
         <cfloop query="local.getProducts" group="productId">
             <cfset local.structProduct = {
                 "productId" : local.getProducts.productId,
@@ -1056,7 +1069,7 @@
         </cfloop>
         <cfset arrayAppend(local.return, local.ProductArray)>
 
-        <cfquery name="local.getImages" datasource="#application.db#">
+        <cfquery name="local.getImages" datasource="#application.db#">          <!--- Product Images --->
             SELECT 
                 img.idproductImage AS imageId,
                 img.imageName AS imageName,
@@ -1092,7 +1105,7 @@
             </cfloop>
         <cfset arrayAppend(local.return, local.ImageArray)>
 
-        <cfquery name="local.getProductsCount" datasource="#application.db#">        <!--- To get sub-cat , Product And product image to show --->
+        <cfquery name="local.getProductsCount" datasource="#application.db#">        <!--- Product count --->
             SELECT
                 COUNT(pdt.idProducts) AS productId
             FROM
@@ -1100,9 +1113,10 @@
             INNER JOIN 
                 Sub_Category AS sub 
                 ON sub.idSubcategory = pdt.Sub_Category_idSubcategory
+            WHERE
+                pdt.product_is_active = 1
             <cfif structKeyExists(url, "subid")>
-                WHERE
-                    sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
+                sub.idSubcategory = <cfqueryparam value="#url.subid#" cfsqltype="cf_sql_integer">
             </cfif>
         </cfquery>
         <cfset arrayAppend(local.return, local.getProductsCount.productId)>

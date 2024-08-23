@@ -37,12 +37,12 @@
                         <cfloop array="#product[2]#" index="product">
                             <div class="col-md-4 my-3">
                                 <div class="card product-card">
-                                    <a href="productDetails.cfm?id=#product.productId#" class="productLink">
+                                    <a href="/product-details/#product.productId#" class="productLink">
                                         <img class="card-img-top productImage" src="/images/thumbnail/#product.thumbnail#" alt="#product.productName#" height="150">
                                         <div class="card-body">
                                             <h5 class="card-title productName">#product.productName#</h5>
                                             <p class="card-text text-danger productPrice">#product.productPrice#</p>
-                                            <a href="productDetails.cfm?id=#product.productId#" class="btn btn-primary">Buy Now</a>
+                                            <a href="/product-details/#product.productId#" class="btn btn-primary">Buy Now</a>
                                         </div>
                                     </a>
                                 </div>

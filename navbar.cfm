@@ -16,7 +16,7 @@
             <button class="btn btn-outline-secondary my-2 my-sm-0" name="searchSubmit" id="searchSubmit">Search</button>
         </div>
     <cfelse>
-        <form action="searchView.cfm" method="post" class="form-inline my-2 my-lg-0">
+        <form action="/searchView.cfm" method="post" class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="searchValue">
             <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit" name="searchSubmit">Search</button>
         </form>

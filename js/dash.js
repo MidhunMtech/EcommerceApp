@@ -25,9 +25,7 @@ $(document).ready(function() {
         showModal("#addProductModal");
     });
 
-    $("#addImages").click(function() {
-        showModal("#addImageModal");
-    });
+    
 
     $(".close, .categoryClose").click(function() {
         hideModal("#addCategoryModal");
@@ -145,6 +143,16 @@ $(document).ready(function() {
                 }
             }
         });
+    });
+
+
+    $("#addImages").click(function(event) {
+        event.preventDefault();
+    
+        // Hide the product modal
+        $('#editProductModal').hide();
+        
+        showModal("#addImageModal");
     });
     
     // Event delegation for dynamically generated editImage buttons
