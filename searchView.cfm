@@ -16,20 +16,6 @@
                 <div class="container mt-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1>Result For "#form.searchValue#"</h1>
-                        <!--- <div class="d-flex">
-
-                        <select class="form-control d-inline-block w-auto mr-2" id="filter" name="filterValue">
-                            <option value="3" class="filter"<!---  <cfif val EQ 3>selected</cfif> --->>Filter by</option>
-                            <option value="0" class="filter">price < 2000</option>
-                            <option value="1" class="filter">price > 2000</option>
-                        </select>
-
-                        <select class="form-control d-inline-block w-auto" id="sort" name="sortValue">
-                            <option value="">Sort by</option>
-                            <option value="ASC">Price: Low to High</option>
-                            <option value="DESC">Price: High to Low</option>
-                        </select>
-                        </div> --->
                     </div>
 
                         <!-- Product Card -->

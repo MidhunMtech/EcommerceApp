@@ -2,6 +2,8 @@ $(document).ready(function() {
     function loadProducts(filterValue = 3, sortValue = "A", pageNo = 0, searchValue = "") {
         let urlParams = new URLSearchParams(window.location.search);
         let subid = urlParams.get('subid');
+        console.log(subid);
+        
         
         $.ajax({
             url: '../component/component.cfc?method=getCategories',

@@ -35,12 +35,12 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`Address` (
   `createdDate` DATETIME,
   `deletedDate` DATETIME,
   `selected` INT,
-  PRIMARY KEY (`idAddress`)
+  `User_idUser` INT,
+  PRIMARY KEY (`idAddress`),
+  CONSTRAINT `fk_User_idUser`
+    FOREIGN KEY (`User_idUser`)
+    REFERENCES `User`(`idUser`)
 );
-ALTER TABLE Address
-ADD COLUMN User_idUser INT,
-ADD CONSTRAINT fk_User_idUser
-FOREIGN KEY (User_idUser) REFERENCES User(idUser);
 
 select * from Address;
 -- truncate table Address;
@@ -214,6 +214,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`productImage` (
 ENGINE = InnoDB;
 
 select * from productImage;
+select * from Products;
 -- truncate table productImage;
 
 
@@ -257,6 +258,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
   `totalAmout` INT,
   `User_idUser` INT NOT NULL,
   `Address_idAddress` INT NOT NULL,
+  `OrderCode` varchar(155),
   PRIMARY KEY (`orderId`),
   INDEX `fk_OrderIdTable_User1_idx` (`User_idUser` ASC) VISIBLE,
   INDEX `fk_OrderIdTable_Address1_idx` (`Address_idAddress` ASC) VISIBLE,
@@ -271,6 +273,7 @@ CREATE TABLE IF NOT EXISTS `Ecommerce`.`OrderIdTable` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
 
 select * from OrderIdTable;
 -- truncate table OrderIdTable;

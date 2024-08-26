@@ -35,7 +35,7 @@
                             <div class="col-md-8">
                                 <h4>Product Name: <span class="text-primary">#order.productName#</span></h4>
                                 <p><strong>Quantity:</strong> #order.quantity#</p>
-                                <p><strong>Order ID:</strong> ###order.orderId#</p>
+                                <p><strong>Order ID:</strong> ###order.OrderCode#</p>
                                 <p><strong>Order Date:</strong> #order.orderDate#</p>
                                 <p><strong>Price:</strong> &##8377; #order.productPrice#</p>
                                 <p><strong>Total Price:</strong> &##8377; #order.productQuantityPrice#</p>

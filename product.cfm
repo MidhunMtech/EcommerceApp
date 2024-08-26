@@ -1,4 +1,5 @@
 <!--- <cfinclude  template="addressAction.cfm"> --->
+<cfdump  var="#url#">
 <cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
     <cfinvokeargument  name="subCatId"  value="#url.subid#">
 </cfinvoke>

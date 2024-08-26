@@ -20,7 +20,10 @@
 
         <cfoutput>
             <h1>Invoice</h1>
-            <h3>Order Id ###url.ord#</h3>
+            <cfloop array="#order#" index="ord">
+                <cfset ordercode = ord.OrderCode>
+            </cfloop>
+            <h3>Order Id ###ordercode#</h3>
             <table border="2">
                 <thead>
                     <tr>

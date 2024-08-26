@@ -1,3 +1,0 @@
-RewriteEngine On
-RewriteRule ^cart$ /cart.cfm [L,QSA]
-RewriteRule ^product-details/([0-9]+)$ /productDetails.cfm?id=$1 [L,QSA]

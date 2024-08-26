@@ -14,15 +14,34 @@ $(document).ready(function() {
     }
 
     $("#addCategory").click(function() {
-        showModal("#addCategoryModal");
+        $('.cat_categoryName').val('');
+        $('.cat_categoryId').val('');
+        showModal("#addEditCategoryModal");
     });
 
     $("#addSubCategory").click(function() {
-        showModal("#addSubCategoryModal");
+        $('.sub_category').val('');
+        $('.sub_category').text('Select a category');
+        $('.sub_subCategoryName').val('');
+        $('.sub_subCategoryId').val('');
+
+        showModal("#addEditSubCategoryModal");
     });
 
     $("#addProducts").click(function() {
-        showModal("#addProductModal");
+        // Clear input fields
+        $('.productName').val('');
+        $('.productDesc').val('');
+        $('.productPrice').val('');
+        $('.productId').val('');
+        $('.pro_subcat').text('Select a sub-category');
+        $('.pro_subcat').val('');
+        $('.thumbnail-container').text('');
+        $('.oldThumbnail').val('');
+        
+        $('.image-container').empty();
+        
+        showModal("#addEditProductModal");
     });
 
     
@@ -32,9 +51,9 @@ $(document).ready(function() {
         hideModal("#addSubCategoryModal");
         hideModal("#addProductModal");
         hideModal("#addImageModal");
-        hideModal("#editCategoryModal");
-        hideModal("#editSubCategoryModal");
-        hideModal("#editProductModal");
+        hideModal("#addEditCategoryModal");
+        hideModal("#addEditSubCategoryModal");
+        hideModal("#addEditProductModal");
         hideModal("#EditImageModal");
     });
 
@@ -43,9 +62,9 @@ $(document).ready(function() {
         handleWindowClick(event, "#addSubCategoryModal");
         handleWindowClick(event, "#addProductModal");
         handleWindowClick(event, "#addImageModal");
-        handleWindowClick(event, "#editCategoryModal");
-        handleWindowClick(event, "#editSubCategoryModal");
-        handleWindowClick(event, "#editProductModal");
+        handleWindowClick(event, "#addEditCategoryModal");
+        handleWindowClick(event, "#addEditSubCategoryModal");
+        handleWindowClick(event, "#addEditProductModal");
         handleWindowClick(event, "#EditImageModal");
     });
 
@@ -77,7 +96,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 var catData = JSON.parse(response);
-                $('#editCategoryModal').show(); 
+                $('#addEditCategoryModal').show(); 
                 
                 $('.cat_categoryName').val(catData[0][0].categoryName);
                 $('.cat_categoryId').val(catData[0][0].categoryId);
@@ -96,7 +115,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 var subData = JSON.parse(response);
-                $('#editSubCategoryModal').show(); 
+                $('#addEditSubCategoryModal').show(); 
                 // console.log(subData);
                 $('.sub_category').val(subData[0][0].categoryId);
                 $('.sub_category').text(subData[0][0].categoryName);
@@ -117,8 +136,9 @@ $(document).ready(function() {
             },
             success: function(response) {
                 var proData = JSON.parse(response);
-                $('#editProductModal').show(); 
+                $('#addEditProductModal').show(); 
                 console.log(proData);
+                console.log(proData[1][0].thumbnail);
     
                 // Populate product details
                 $('.pro_subcat').text(proData[1][0].subCategoryName);
@@ -127,6 +147,9 @@ $(document).ready(function() {
                 $('.productDesc').val(proData[1][0].productDescription);
                 $('.productPrice').val(proData[1][0].productPrice);
                 $('.productId').val(proData[1][0].productId);
+                $('.thumbnail-container').text(proData[1][0].thumbnail);
+                // $('.productThumbnail').val(proData[1][0].thumbnail);
+                $('.oldThumbnail').val(proData[1][0].thumbnail);
     
                 // Clear the image container before appending new data
                 $('.image-container').empty();
@@ -136,7 +159,7 @@ $(document).ready(function() {
                         <div class="list-group-item align-items-center">
                             <span class="imageName">${proData[2][i].imageName}</span>
                             <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="${proData[2][i].imageId}">Delete</button>
-                            <button class="btn btn-secondary btn-sm float-right editImage" data-userid="${proData[2][i].imageId}">Edit</button>
+                            <!--- <button class="btn btn-secondary btn-sm float-right editImage" data-userid="${proData[2][i].imageId}">Edit</button> --->
                         </div>
                     `;
                     $('.image-container').append(imageNameHtml);
@@ -150,7 +173,7 @@ $(document).ready(function() {
         event.preventDefault();
     
         // Hide the product modal
-        $('#editProductModal').hide();
+        $('#addEditProductModal').hide();
         
         showModal("#addImageModal");
     });
@@ -161,7 +184,7 @@ $(document).ready(function() {
         event.preventDefault();
     
         // Hide the product modal
-        $('#editProductModal').hide();
+        $('#addEditProductModal').hide();
     
         // Get the image ID
         var imgid = $(this).data('userid');
@@ -195,7 +218,7 @@ $(document).ready(function() {
         event.preventDefault();
     
         // Hide the product modal
-        $('#editProductModal').hide();
+        // $('#editProductModal').hide();
 
         var imgid = $(this).data('userid');
         if (confirm("Are you sure you want to delete this?")) {
@@ -211,30 +234,6 @@ $(document).ready(function() {
             });
         }
     });
-    
-
-
-    /* $(".editImage").click(function() { 
-        var imgid = $(this).data('userid');
-        $.ajax({
-            url: '../component/component.cfc?method=getCategories',
-            method: 'GET',
-            data: {
-                imgid : imgid
-            },
-            success: function(response) {
-                var imgData = JSON.parse(response);
-                console.log(imgData);
-                $('#EditImageModal').show();
-                $(".imgProductId").text(imgData[2][0].productName);
-                $(".imgProductId").val(imgData[2][0].productId);
-                $(".oldImg").text(imgData[2][0].imageName);
-                $(".oldImgName").val(imgData[2][0].imageName);
-                $(".imgId").val(imgData[2][0].imageId);
-            }
-        });
-    }); */
-
     
 
     function deleteItem(itemType, itemId) {
@@ -339,5 +338,26 @@ $(document).ready(function() {
                 }
             });
         }
+    }); */
+
+    /* $(".editImage").click(function() { 
+        var imgid = $(this).data('userid');
+        $.ajax({
+            url: '../component/component.cfc?method=getCategories',
+            method: 'GET',
+            data: {
+                imgid : imgid
+            },
+            success: function(response) {
+                var imgData = JSON.parse(response);
+                console.log(imgData);
+                $('#EditImageModal').show();
+                $(".imgProductId").text(imgData[2][0].productName);
+                $(".imgProductId").val(imgData[2][0].productId);
+                $(".oldImg").text(imgData[2][0].imageName);
+                $(".oldImgName").val(imgData[2][0].imageName);
+                $(".imgId").val(imgData[2][0].imageId);
+            }
+        });
     }); */
 });

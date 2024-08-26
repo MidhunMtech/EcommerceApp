@@ -1,1 +1,1 @@
-<cflocation  url="./home.cfm">
+<cflocation  url="./home">

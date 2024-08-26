@@ -12,10 +12,6 @@
 
     <!-- Navbar -->
     <cfinclude  template="/navbar.cfm">
-    <!--- <cfif structKeyExists(form, "searchSubmit")>
-        <cfset getCat = application.component.getCategories(searchValue = form.searchValue)>
-        <!--- <cfdump  var="#result#"> --->
-    </cfif> --->
 
     <!-- Hero Section -->
     <div class="hero">
@@ -41,7 +37,7 @@
                                         <div class="card-body">
                                             <h5 class="card-title">#product.productName#</h5>
                                             <p class="card-text text-danger">&##8377; #product.productPrice#</p>
-                                            <a href="product-details/#product.productId#" class="btn btn-primary">Buy Now</a>
+                                            <a href="productDetails.cfm?id=#product.productId#&#product.productName#" class="btn btn-primary">Buy Now</a>
                                         </div>
                                     </a>
                                 <cfcatch type="any">
@@ -60,11 +56,11 @@
     <nav aria-label="Page navigation" class="mt-auto">
         <ul class="pagination justify-content-center">
         <cfoutput>
-            <li class="page-item"><a class="page-link" href="home.cfm?page=<cfif structKeyExists(url,"page") AND url.page GT 0>#url.page-1#<cfelse>0</cfif>">Previous</a></li>
+            <li class="page-item <cfif structKeyExists(url,"page") AND url.page GT 0><cfelse>disabled</cfif>"><a class="page-link" href="home.cfm?page=<cfif structKeyExists(url,"page") AND url.page GT 0>#url.page-1#<cfelse>0</cfif>">Previous</a></li>
             <cfloop from="0" to="#totalPages#" index="i">
                 <li class="page-item"><a class="page-link" href="home.cfm?page=#i#">#i#</a></li>
             </cfloop>
-            <li class="page-item"><a class="page-link" href="home.cfm?page=<cfif structKeyExists(url,"page") AND url.page LT totalPages>#url.page+1#<cfelseif structKeyExists(url,"page") AND url.page EQ totalPages>#i-1#<cfelse>#i-totalPages#</cfif>">Next</a></li>
+            <li class="page-item <cfif structKeyExists(url,"page") AND url.page EQ totalPages>disabled</cfif>"><a class="page-link" href="home.cfm?page=<cfif structKeyExists(url,"page") AND url.page LT totalPages>#url.page+1#<cfelseif structKeyExists(url,"page") AND url.page EQ totalPages>#i-1#<cfelse>#i-totalPages#</cfif>">Next</a></li>
         </cfoutput>
         </ul>
     </nav>
