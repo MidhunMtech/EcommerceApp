@@ -1,6 +1,7 @@
 <cfinvoke  method="getCategories" component="component.component" returnVariable="getCat">
     <cfinvokeargument  name="id"  value="#url.id#">
 </cfinvoke>
+<cfdump  var="#url#">
 <cfinvoke  method="rating" component="component.component" returnVariable="rating">
 <!--- <cfdump  var="#getCat[2]#">
 <cfdump  var="#getCat[3]#">
