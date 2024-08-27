@@ -202,21 +202,16 @@
     </cffunction>
 
 
-    <cffunction  name="addAndEditProducts" access="public" returnType="void">
+    <cffunction  name="addAndEditProducts" access="public" returnType="struct">
         <cfargument  name="form" type="any" required="true">
 
-        <cfif structKeyExists(form, "cat_categoryName")>        <!--- To Add and Edit Category --->
-            <cfif structKeyExists(form, "cat_categoryId") AND val(arguments.form.cat_categoryId)>       <!--- Edit category --->
-                <cfquery name="local.editCategory" datasource="#application.db#">
-                    UPDATE 
-                        Category
-                    SET 
-                        nameCategory = <cfqueryparam value="#arguments.form.cat_categoryName#" cfsqltype="cf_sql_varchar">,
-                        Admin_edited = <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">
-                    WHERE
-                        idCategory = <cfqueryparam value="#arguments.form.cat_categoryId#" cfsqltype="cf_sql_integer">
-                </cfquery> 
-            <cfelse>                                            <!--- Add category --->
+        <cfset local.return = {
+            "success" : 1,
+            "message" : ''
+        }>
+
+        <cftry>
+            <cfif structKeyExists(form, "cat_categoryName")>        <!--- To Add and Edit Category --->
                 <cfquery name="local.toCheckCategory" datasource="#application.db#">        <!--- To check category name exists or not --->
                     SELECT 
                         nameCategory
@@ -225,170 +220,243 @@
                     WHERE
                         nameCategory = <cfqueryparam value="#arguments.form.cat_categoryName#" cfsqltype="varchar">
                         AND category_is_active = 1
+                        <cfif structKeyExists(form, "cat_categoryId") AND val(arguments.form.cat_categoryId)>
+                            AND idCategory != <cfqueryparam value="#arguments.form.cat_categoryId#" cfsqltype="integer">
+                        </cfif>
+                </cfquery>
+                
+                <cfif structKeyExists(form, "cat_categoryId") AND val(arguments.form.cat_categoryId)>       <!--- Edit category --->
+                    <cfif NOT queryRecordCount(local.toCheckCategory)>
+                        <cfquery name="local.editCategory" datasource="#application.db#">
+                            UPDATE 
+                                Category
+                            SET 
+                                nameCategory = <cfqueryparam value="#arguments.form.cat_categoryName#" cfsqltype="cf_sql_varchar">,
+                                Admin_edited = <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">
+                            WHERE
+                                idCategory = <cfqueryparam value="#arguments.form.cat_categoryId#" cfsqltype="cf_sql_integer">
+                        </cfquery> 
+                    
+                        <cfset local.return["message"] = "Category update successfully completed">
+                    <cfelse>
+                        <cfset local.return = {
+                            "success" : 0,
+                            "message" : 'Category failed due to category name exists'
+                        }>
+                    </cfif>
+                <cfelse>                                            <!--- Add category --->
+                    <cfif NOT queryRecordCount(local.toCheckCategory)>      <!--- if category name not exists add cat --->
+                        <cfquery name="local.addCategory" datasource="#application.db#">
+                            INSERT INTO
+                                Category(
+                                    nameCategory,
+                                    Admin_created,
+                                    createdDate
+                                )
+                            VALUES (
+                                <cfqueryparam value="#arguments.form.cat_categoryName#" cfsqltype="cf_sql_varchar">,
+                                <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+                            )
+                        </cfquery>
+                        <cfset local.return = {
+                            "success" : 1,
+                            "message" : 'Category added successfully'
+                        }>
+                    <cfelse>
+                        <cfset local.return["message"] = 'Category added failed due to category name exists.'>
+                    </cfif>
+                </cfif>
+            </cfif>
+
+            <cfif structKeyExists(form, "sub_subCategoryName")>         <!--- To Add and Edit SubCategory --->
+                <cfquery name="local.toCheckSubcat" datasource="#application.db#">      <!--- to check Sub-cat name exists or not --->
+                    SELECT  
+                        nameSubCategory
+                    FROM 
+                        Sub_Category
+                    WHERE
+                        nameSubCategory = <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="varchar">
+                        AND Category_idCategory = <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="integer">
+                        AND Sub_Category_is_delete = 0
+                        <cfif structKeyExists(form, "sub_subCategoryId") AND val(arguments.form.sub_subCategoryId)>
+                            AND idSubcategory != <cfqueryparam value="#arguments.form.sub_subCategoryId#" cfsqltype="integer">
+                        </cfif>
+                </cfquery>
+                
+                <cfif structKeyExists(form, "sub_subCategoryId") AND val(arguments.form.sub_subCategoryId)>     <!--- Edit Subcategory --->
+                    <cfif NOT queryRecordCount(local.toCheckSubcat)>
+                        <cfquery name="local.editSubCategory" datasource="#application.db#">
+                            UPDATE 
+                                Sub_Category
+                            SET 
+                                nameSubCategory = <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="cf_sql_varchar">,
+                                Category_idCategory = <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="cf_sql_integer">,
+                                Admin_isEdited = <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">
+                            WHERE
+                                idSubcategory = <cfqueryparam value="#arguments.form.sub_subCategoryId#" cfsqltype="cf_sql_integer">
+                        </cfquery>
+                        <cfset local.return["message"] = 'Subcategory updated successfully'>
+                    <cfelse>
+                        <cfset local.return = {
+                            "success" : 0,
+                            "message" : 'Subcategory update failed due to subCat name exists'
+                        }>
+                    </cfif>
+                <cfelse>            <!--- Add Subcategory --->
+                    <cfif NOT queryRecordCount(local.toCheckSubcat)>            <!--- if sub-cat name not exists add sub cat --->
+                        <cfquery name="local.addsubCategory" datasource="#application.db#">
+                            INSERT INTO 
+                                Sub_Category (
+                                    nameSubCategory,
+                                    Category_idCategory,
+                                    Admin_isCreated,
+                                    createdDate
+                                )
+                            VALUES (
+                                <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="cf_sql_varchar">,
+                                <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+                            )
+                        </cfquery>
+                        <cfset local.return = {
+                            "success" : 1,
+                            "message" : 'added successfully'
+                        }>
+                    <cfelse>
+                        <cfset local.return = {
+                            "success" : 0,
+                            "message" : 'Update failed due to name exists'
+                        }>
+                    </cfif>
+                </cfif>
+            </cfif>
+
+            <cfif structKeyExists(form, "pro_productName")>             <!-- Adding and Edit Products -->
+                <cfparam  name="local.pro_thumbnail" default="">
+                <cfif structKeyExists(form, "pro_thumbnail") AND LEN(arguments.form.pro_thumbnail)>
+                    <cfset thumbnailDirectory = expandpath('/images/thumbnail')>
+                    <cffile  action="upload"
+                        destination="#thumbnailDirectory#" 
+                        fileField="form.pro_thumbnail" 
+                        nameConflict="makeunique">
+                    <cfset local.pro_thumbnail = cffile.serverfile>
+                </cfif>
+
+                <cfquery name="local.toCheckProducts" datasource="#application.db#">
+                    SELECT 
+                        nameProduct
+                    FROM 
+                        Products
+                    WHERE
+                        nameProduct = <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">
+                        AND Sub_Category_idSubcategory = <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">
+                        AND product_is_active = 1
+                        <cfif structKeyExists(form, "pro_productId") AND val(arguments.form.pro_productId)>  
+                            AND idProducts != <cfqueryparam value="#arguments.form.pro_productId#" cfsqltype="integer">
+                        </cfif>
                 </cfquery>
 
-                <cfif NOT queryRecordCount(local.toCheckCategory)>      <!--- if category name not exists add cat --->
-                    <cfquery name="local.addCategory" datasource="#application.db#">
-                        INSERT INTO
-                            Category(
-                                nameCategory,
-                                Admin_created,
-                                createdDate
-                            )
-                        VALUES (
-                            <cfqueryparam value="#arguments.form.cat_categoryName#" cfsqltype="cf_sql_varchar">,
-                            <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-                        )
-                    </cfquery>
-                </cfif>
-            </cfif>
-        </cfif>
-
-        <cfif structKeyExists(form, "sub_subCategoryName")>         <!--- To Add and Edit SubCategory --->
-            <cfquery name="local.toCheckSubcat" datasource="#application.db#">      <!--- to check Sub-cat name exists or not --->
-                SELECT  
-                    nameSubCategory
-                FROM 
-                    Sub_Category
-                WHERE
-                    nameSubCategory = <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="varchar">
-                    AND Category_idCategory = <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="integer">
-                    AND Sub_Category_is_delete = 0
-            </cfquery>
-            
-            <cfif structKeyExists(form, "sub_subCategoryId") AND val(arguments.form.sub_subCategoryId)>     <!--- Edit Subcategory --->
-                <cfif NOT queryRecordCount(local.toCheckSubcat)>
-                    <cfquery name="local.editSubCategory" datasource="#application.db#">
-                        UPDATE 
-                            Sub_Category
-                        SET 
-                            nameSubCategory = <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="cf_sql_varchar">,
-                            Category_idCategory = <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="cf_sql_integer">,
-                            Admin_isEdited = <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">
-                        WHERE
-                            idSubcategory = <cfqueryparam value="#arguments.form.sub_subCategoryId#" cfsqltype="cf_sql_integer">
-                    </cfquery>
-                </cfif>
-            <cfelse>            <!--- Add Subcategory --->
-                <cfif NOT queryRecordCount(local.toCheckSubcat)>            <!--- if sub-cat name not exists add sub cat --->
-                    <cfquery name="local.addsubCategory" datasource="#application.db#">
-                        INSERT INTO 
-                            Sub_Category (
-                                nameSubCategory,
-                                Category_idCategory,
-                                Admin_isCreated,
-                                createdDate
-                            )
-                        VALUES (
-                            <cfqueryparam value="#arguments.form.sub_subCategoryName#" cfsqltype="cf_sql_varchar">,
-                            <cfqueryparam value="#arguments.form.sub_mainCategory#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-                        )
-                    </cfquery>
-                </cfif>
-            </cfif>
-        </cfif>
-
-        <cfif structKeyExists(form, "pro_productName")>             <!-- Adding and Edit Products -->
-            <cfparam  name="local.pro_thumbnail" default="">
-            <cfif structKeyExists(form, "pro_thumbnail") AND LEN(arguments.form.pro_thumbnail)>
-                <cfset thumbnailDirectory = expandpath('/images/thumbnail')>
-                <cffile  action="upload"
-                    destination="#thumbnailDirectory#" 
-                    fileField="form.pro_thumbnail" 
-                    nameConflict="makeunique">
-                <cfset local.pro_thumbnail = cffile.serverfile>
-            </cfif>
-
-            <cfquery name="local.toCheckProducts" datasource="#application.db#">
-                SELECT 
-                    nameProduct
-                FROM 
-                    Products
-                WHERE
-                    nameProduct = <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">
-                    AND Sub_Category_idSubcategory = <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">
-                    AND product_is_active = 1
-            </cfquery>
-
-            <cfif structKeyExists(form, "pro_productId") AND val(arguments.form.pro_productId)>      <!--- Edit Products --->
-                <cfif NOT queryRecordCount(local.toCheckProducts)>
-                    <cfquery name="local.editProducts" datasource="#application.db#">
-                        UPDATE 
-                            Products
-                        SET 
-                            nameProduct = <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">,
-                            Description = <cfqueryparam value="#arguments.form.pro_productDesc#" cfsqltype="cf_sql_varchar">,
-                            Price = <cfqueryparam value="#arguments.form.pro_productPrice#" cfsqltype="cf_sql_integer">,
-                            Sub_Category_idSubcategory = <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">
-                            <cfif structKeyExists(form, "pro_thumbnail") AND LEN(arguments.form.pro_thumbnail)>
-                            , thumbnail = <cfqueryparam value="#local.pro_thumbnail#" cfsqltype="cf_sql_varchar">
-                            </cfif>
-                        WHERE
-                            idProducts = <cfqueryparam value="#arguments.form.pro_productId#" cfsqltype="cf_sql_integer">
-                    </cfquery>
-                    <cfset local.productId = arguments.form.pro_productId>
-                </cfif>
-            <cfelse>
-                <cfif NOT queryRecordCount(local.toCheckProducts)>
-                    <cfquery name="local.addProducts" datasource="#application.db#" result="local.getProductId">
-                        INSERT INTO 
-                            Products (
-                                nameProduct,
-                                Description,
-                                Price,
-                                Sub_Category_idSubcategory,
-                                admin_Created,
-                                thumbnail
-                            )
-                        VALUES (
-                            <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">,
-                            <cfqueryparam value="#arguments.form.pro_productDesc#" cfsqltype="cf_sql_varchar">,
-                            <cfqueryparam value="#arguments.form.pro_productPrice#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
-                            <cfqueryparam value="#local.pro_thumbnail#" cfsqltype="cf_sql_varchar">
-                        )
-                    </cfquery>
-                    <cfset local.productId = local.getProductId.GENERATEDKEY>
-                </cfif>
-            </cfif>
-
-            <cfif structKeyExists(form, "images") AND Len(arguments.form.images)>            <!--- Adding Image for products --->
-                <cfset imageDirectory = expandpath('/images/products')>
-                <cffile  action="uploadAll"
-                    destination="#imageDirectory#" 
-                    fileField="form.images" 
-                    nameConflict="makeunique">
-                    <cfdump  var="#cffile#">
-                <cfset local.productImg = []>
-                <cfloop array="#cffile.UPLOADALLRESULTS#" index="img">
-                    <cfif img.serverfile NEQ local.pro_thumbnail>
-                        <cfset arrayAppend(local.productImg, img.serverfile)>
+                <cfif structKeyExists(form, "pro_productId") AND val(arguments.form.pro_productId)>      <!--- Edit Products --->
+                    <cfif NOT queryRecordCount(local.toCheckProducts)>
+                        <cfquery name="local.editProducts" datasource="#application.db#">
+                            UPDATE 
+                                Products
+                            SET 
+                                nameProduct = <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">,
+                                Description = <cfqueryparam value="#arguments.form.pro_productDesc#" cfsqltype="cf_sql_varchar">,
+                                Price = <cfqueryparam value="#arguments.form.pro_productPrice#" cfsqltype="cf_sql_integer">,
+                                Sub_Category_idSubcategory = <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">
+                                <cfif structKeyExists(form, "pro_thumbnail") AND LEN(arguments.form.pro_thumbnail)>
+                                , thumbnail = <cfqueryparam value="#local.pro_thumbnail#" cfsqltype="cf_sql_varchar">
+                                </cfif>
+                            WHERE
+                                idProducts = <cfqueryparam value="#arguments.form.pro_productId#" cfsqltype="cf_sql_integer">
+                        </cfquery>
+                        <cfset local.productId = arguments.form.pro_productId>
+                        <cfset local.return = {
+                            "success" : 1,
+                            "message" : 'product update successfully'
+                        }>
+                    <cfelse>
+                        <cfset local.return = {
+                            "success" : 0,
+                            "message" : 'Product update failed due to product exists'
+                        }>
                     </cfif>
-                </cfloop>
-                <!--- <cfset local.proImage = cffile.serverfile> --->
-
-                <cfif NOT queryRecordCount(local.toCheckProducts)>
-                    <cfquery name="local.addImages" datasource="#application.db#">
-                        INSERT INTO 
-                            productImage (
-                                imageName,
-                                Products_idProducts
+                <cfelse>
+                    <cfif NOT queryRecordCount(local.toCheckProducts)>
+                        <cfquery name="local.addProducts" datasource="#application.db#" result="local.getProductId">
+                            INSERT INTO 
+                                Products (
+                                    nameProduct,
+                                    Description,
+                                    Price,
+                                    Sub_Category_idSubcategory,
+                                    admin_Created,
+                                    thumbnail
+                                )
+                            VALUES (
+                                <cfqueryparam value="#arguments.form.pro_productName#" cfsqltype="cf_sql_varchar">,
+                                <cfqueryparam value="#arguments.form.pro_productDesc#" cfsqltype="cf_sql_varchar">,
+                                <cfqueryparam value="#arguments.form.pro_productPrice#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#arguments.form.pro_subcategory#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#session.adminid#" cfsqltype="cf_sql_integer">,
+                                <cfqueryparam value="#local.pro_thumbnail#" cfsqltype="cf_sql_varchar">
                             )
-                        VALUES 
-                            <cfloop from="1" to="#arrayLen(local.productImg)#" index="i">
-                                (
-                                    <cfqueryparam value="#local.productImg[i]#" cfsqltype="cf_sql_varchar">,
-                                    <cfqueryparam value="#local.productId#" cfsqltype="cf_sql_integer">
-                                )<cfif i EQ arrayLen(local.productImg)><cfelse>,</cfif>
-                            </cfloop>
-                    </cfquery>
+                        </cfquery>
+                        <cfset local.productId = local.getProductId.GENERATEDKEY>
+                    <cfelse>
+                        <cfset local.return = {
+                            "success" : 0,
+                            "message" : 'Product added Failed due to product exists in the same subcategory'
+                        }>
+                    </cfif>
+                </cfif>
+
+                <cfif structKeyExists(form, "images") AND Len(arguments.form.images)>            <!--- Adding Image for products --->
+                    <cfset imageDirectory = expandpath('/images/products')>
+                    <cffile  action="uploadAll"
+                        destination="#imageDirectory#" 
+                        fileField="form.images" 
+                        nameConflict="makeunique">
+                        <cfdump  var="#cffile#">
+                    <cfset local.productImg = []>
+                    <cfloop array="#cffile.UPLOADALLRESULTS#" index="img">
+                        <cfif img.serverfile NEQ local.pro_thumbnail>
+                            <cfset arrayAppend(local.productImg, img.serverfile)>
+                        </cfif>
+                    </cfloop>
+                    <!--- <cfset local.proImage = cffile.serverfile> --->
+
+                    <cfif NOT queryRecordCount(local.toCheckProducts)>
+                        <cfquery name="local.addImages" datasource="#application.db#">
+                            INSERT INTO 
+                                productImage (
+                                    imageName,
+                                    Products_idProducts
+                                )
+                            VALUES 
+                                <cfloop from="1" to="#arrayLen(local.productImg)#" index="i">
+                                    (
+                                        <cfqueryparam value="#local.productImg[i]#" cfsqltype="cf_sql_varchar">,
+                                        <cfqueryparam value="#local.productId#" cfsqltype="cf_sql_integer">
+                                    )<cfif i EQ arrayLen(local.productImg)><cfelse>,</cfif>
+                                </cfloop>
+                        </cfquery>
+                    </cfif>
                 </cfif>
             </cfif>
-        </cfif>
+        <cfcatch type="any">
+            <cfset local.return = {
+                "success" : 0,
+                "message" : 'Unexpected Error. Try again....'
+            }>
+        </cfcatch>
+        </cftry>
+        
+        <cfreturn local.return>
     </cffunction>
 
 
