@@ -67,8 +67,5 @@
 
     <!-- Footer -->
     <cfinclude  template="/footer.cfm">
-
-    <!--- <cfset session.userid = 1>
-    <cfset structClear(session)> --->
 </body>
 </html>
