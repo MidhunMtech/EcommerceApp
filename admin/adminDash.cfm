@@ -154,7 +154,7 @@
                     <option value="" class="pro_subcat">Select a sub-category</option>
                     <cfloop array="#getCat[1]#" index="sub">
                       <cfloop array="#sub.subCategory#" index="subCategory">
-                        <cfif len(subCategory.Name)>
+                        <cfif len(subCategory.Name) AND subCategory.is_delete EQ 0>
                           <option value="#subCategory.Id#">#subCategory.Name#</option>
                         </cfif>
                       </cfloop>

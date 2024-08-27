@@ -42,15 +42,9 @@ $(document).ready(function() {
         $('.image-container').empty();
         
         showModal("#addEditProductModal");
-    });
-
-    
+    }); 
 
     $(".close, .categoryClose").click(function() {
-        hideModal("#addCategoryModal");
-        hideModal("#addSubCategoryModal");
-        hideModal("#addProductModal");
-        hideModal("#addImageModal");
         hideModal("#addEditCategoryModal");
         hideModal("#addEditSubCategoryModal");
         hideModal("#addEditProductModal");
@@ -58,10 +52,6 @@ $(document).ready(function() {
     });
 
     $(window).click(function(event) {
-        handleWindowClick(event, "#addCategoryModal");
-        handleWindowClick(event, "#addSubCategoryModal");
-        handleWindowClick(event, "#addProductModal");
-        handleWindowClick(event, "#addImageModal");
         handleWindowClick(event, "#addEditCategoryModal");
         handleWindowClick(event, "#addEditSubCategoryModal");
         handleWindowClick(event, "#addEditProductModal");
@@ -73,7 +63,7 @@ $(document).ready(function() {
         const newImageInput = $('<input>', {
             type: 'file',
             class: 'form-control-file',
-            name: 'images',  // Use the array syntax for multiple files
+            name: 'images',  
             accept: 'image/*',
             required: true
         });
@@ -156,10 +146,11 @@ $(document).ready(function() {
     
                 for (var i in proData[2]) {
                     let imageNameHtml = `
-                        <div class="list-group-item align-items-center">
+                        <div class="list-group-item align-items-center image-item-${proData[2][i].imageId}">
                             <span class="imageName">${proData[2][i].imageName}</span>
-                            <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="${proData[2][i].imageId}">Delete</button>
-                            <!--- <button class="btn btn-secondary btn-sm float-right editImage" data-userid="${proData[2][i].imageId}">Edit</button> --->
+                            <button class="btn btn-danger btn-sm mx-2 float-right deleteImage" data-userid="${proData[2][i].imageId}">
+                                Delete
+                            </button>
                         </div>
                     `;
                     $('.image-container').append(imageNameHtml);
@@ -168,57 +159,9 @@ $(document).ready(function() {
         });
     });
 
-
-    $("#addImages").click(function(event) {
-        event.preventDefault();
-    
-        // Hide the product modal
-        $('#addEditProductModal').hide();
-        
-        showModal("#addImageModal");
-    });
-    
-    // Event delegation for dynamically generated editImage buttons
-    $('.image-container').on('click', '.editImage', function(event) {
-        // Prevent the default behavior (page reload)
-        event.preventDefault();
-    
-        // Hide the product modal
-        $('#addEditProductModal').hide();
-    
-        // Get the image ID
-        var imgid = $(this).data('userid');
-    
-        // Make the AJAX request to fetch image data
-        $.ajax({
-            url: '../component/component.cfc?method=getCategories',
-            method: 'GET',
-            data: {
-                imgid: imgid
-            },
-            success: function(response) {
-                var imgData = JSON.parse(response);
-                console.log(imgData);
-    
-                // Show the image edit modal
-                $('#EditImageModal').show();
-    
-                // Populate the modal with the image data
-                $(".imgProductId").text(imgData[2][0].productName);
-                $(".imgProductId").val(imgData[2][0].productId);
-                $(".oldImg").text(imgData[2][0].imageName);
-                $(".oldImgName").val(imgData[2][0].imageName);
-                $(".imgId").val(imgData[2][0].imageId);
-            }
-        });
-    });
     
     $('.image-container').on('click', '.deleteImage', function(event) {
-        // Prevent the default behavior (page reload)
         event.preventDefault();
-    
-        // Hide the product modal
-        // $('#editProductModal').hide();
 
         var imgid = $(this).data('userid');
         if (confirm("Are you sure you want to delete this?")) {
@@ -229,12 +172,11 @@ $(document).ready(function() {
                     imgid: imgid
                 },
                 success: function(response) {
-                    window.location.href = 'adminDash.cfm';
+                    $('.image-item-' + imgid).remove();
                 }
             });
         }
     });
-    
 
     function deleteItem(itemType, itemId) {
         if (confirm("Are you sure you want to delete this?")) {
@@ -266,98 +208,4 @@ $(document).ready(function() {
         deleteItem('catid', catid);
     });
 
-    /* $(".deleteImage").click(function() { 
-        var imgid = $(this).data('userid');
-        deleteItem('imgid', imgid);
-    }); */
-    
-
-    /* $(".deleteImage").click(function() { 
-        var imgid = $(this).data('userid');
-
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: '../component/component.cfc?method=deleteProduct',
-                method: 'POST',
-                data: {
-                    imgid : imgid  
-                },
-                success: function(response) {
-                    window.location.href = 'adminDash.cfm';
-                }
-            });
-        }
-    });
-
-    $(".deleteProduct").click(function() { 
-        var proid = $(this).data('userid');
-
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: '../component/component.cfc?method=deleteProduct',
-                method: 'POST',
-                data: {
-                    proid : proid  
-                },
-                success: function(response) {
-                    window.location.href = 'adminDash.cfm';
-                }
-            });
-        }
-    });
-
-    $(".deleteSubCategory").click(function() { 
-        var subid = $(this).data('userid');
-
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: '../component/component.cfc?method=deleteProduct',
-                method: 'POST',
-                data: {
-                    subid : subid  
-                },
-                success: function(response) {
-                    window.location.href = 'adminDash.cfm';
-                }
-            });
-        }
-    });
-
-    $(".deleteCategory").click(function() { 
-        var catid = $(this).data('userid');
-
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: '../component/component.cfc?method=deleteProduct',
-                method: 'POST',
-                data: {
-                    catid : catid  
-                },
-                success: function(response) {
-                    window.location.href = 'adminDash.cfm';
-                }
-            });
-        }
-    }); */
-
-    /* $(".editImage").click(function() { 
-        var imgid = $(this).data('userid');
-        $.ajax({
-            url: '../component/component.cfc?method=getCategories',
-            method: 'GET',
-            data: {
-                imgid : imgid
-            },
-            success: function(response) {
-                var imgData = JSON.parse(response);
-                console.log(imgData);
-                $('#EditImageModal').show();
-                $(".imgProductId").text(imgData[2][0].productName);
-                $(".imgProductId").val(imgData[2][0].productId);
-                $(".oldImg").text(imgData[2][0].imageName);
-                $(".oldImgName").val(imgData[2][0].imageName);
-                $(".imgId").val(imgData[2][0].imageId);
-            }
-        });
-    }); */
 });

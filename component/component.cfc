@@ -206,7 +206,7 @@
         <cfargument  name="form" type="any" required="true">
 
         <cfif structKeyExists(form, "cat_categoryName")>        
-            <cfif structKeyExists(form, "cat_categoryId") AND len(arguments.form.cat_categoryId)>       <!--- Edit category --->
+            <cfif structKeyExists(form, "cat_categoryId") AND val(arguments.form.cat_categoryId)>       <!--- Edit category --->
                 <cfquery name="local.editCategory" datasource="#application.db#">
                     UPDATE 
                         Category
@@ -932,8 +932,7 @@
                     sub.idSubcategory = <cfqueryparam value="#arguments.subid#" cfsqltype="cf_sql_integer">
                     AND
                 </cfif>
-                (ctr.category_is_active = 1) 
-                AND  sub.Sub_Category_is_delete = 0
+                ctr.category_is_active = 1
             ORDER BY 
                 categoryId
         </cfquery>

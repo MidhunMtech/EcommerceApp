@@ -35,7 +35,9 @@
                                 <a class="dropdown-item dropdown-toggle" href="">#cat.categoryName#</a>
                                 <ul class="dropdown-menu">
                                     <cfloop array="#cat.subCategory#" index="sub">
-                                        <li><a class="dropdown-item" href="/product.cfm?subid=#sub.Id#">#sub.Name#</a></li>
+                                        <cfif sub.is_delete EQ 0>
+                                            <li><a class="dropdown-item" href="/product.cfm?subid=#sub.Id#">#sub.Name#</a></li>
+                                        </cfif>
                                     </cfloop>
                                 </ul>
                             </li>
