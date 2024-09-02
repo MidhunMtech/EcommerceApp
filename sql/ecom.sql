@@ -215,6 +215,7 @@ ENGINE = InnoDB;
 
 select * from productImage;
 select * from Products;
+use ecommerce;
 -- truncate table productImage;
 
 
